@@ -1,9 +1,5 @@
-package org.example.server.entity;
+package org.example.server.dto.recompense;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,10 +11,7 @@ import java.time.LocalDate;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-@Entity(name = "recompenses")
-public class Recompense {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+public class RecompenseDtoGet {
     private Long id;
     private String nom;
     private String description;

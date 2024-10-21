@@ -23,7 +23,6 @@ public class Paiement {
     private StatutPaiement statut;
     private String moyenPaiement;
     private LocalDateTime datePaiement;
-    @ManyToOne
-    @JoinColumn(name = "commande_id")
+    @OneToOne(mappedBy = "paiement")
     private Commande commande;
 }

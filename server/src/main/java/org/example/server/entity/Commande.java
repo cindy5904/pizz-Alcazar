@@ -21,10 +21,20 @@ public class Commande {
     private String detailsCommande;
     @Enumerated(EnumType.STRING)
     private EtatCommande statut;
+    private String adresseLivraison;
+    private String telephone;
+    private String typeLivraison;
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Utilisateur user;
+    @OneToOne
+    @JoinColumn(name = "paiement_id")
+    private Paiement paiement;
+    @OneToOne
+    @JoinColumn(name = "panier_id")
+    private Panier panier;
     @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
-    private List<Paiement> paiements;
+    private List<CommandeItem> itemsCommande;
+
 
 }

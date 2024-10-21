@@ -18,8 +18,7 @@ public class HistoriqueFidelite {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
     private LocalDateTime dateTransaction;
-    private int pointsGagnes;
-    private String typeTransaction;
+
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Utilisateur user;

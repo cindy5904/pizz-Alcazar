@@ -5,5 +5,6 @@ public enum EtatCommande {
     EN_PREPARATION,
     EN_LIVRAISON,
     TERMINEE,
+    EN_COURS,
     ANNULEE;
 }

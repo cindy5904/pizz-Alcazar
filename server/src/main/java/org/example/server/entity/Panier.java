@@ -25,4 +25,6 @@ public class Panier {
     private Utilisateur user;
     @OneToMany(mappedBy = "panier", cascade = CascadeType.ALL)
     private List<PanierItem> itemsPanier;
+    @OneToOne(mappedBy = "panier")
+    private Commande commande;
 }
