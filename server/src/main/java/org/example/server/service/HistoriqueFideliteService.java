@@ -47,6 +47,10 @@ public class HistoriqueFideliteService {
         return convertToDto(historique);
     }
 
+    public List<HistoriqueFidelite> findByUserId(Long userId) {
+        return historiqueFideliteRepository.findByUserId(userId);
+    }
+
     public List<HistoriqueFideliteDtoGet> getHistoriqueParMois(int annee, int mois) {
         LocalDate debut = LocalDate.of(annee, mois, 1);
         LocalDate fin = debut.plusMonths(1);

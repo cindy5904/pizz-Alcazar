@@ -59,6 +59,10 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         utilisateur.setAdresse(registerDto.getAdresse());
         utilisateur.setTelephone(registerDto.getTelephone());
 
+        Role roleClient = roleRepository.findByName("ROLE_CLIENT")
+                .orElseThrow(() -> new RuntimeException("Rôle non trouvé"));
+        utilisateur.getUserRoles().add(roleClient);
+
         utilisateurRepository.save(utilisateur);
         return "User Registered Successfully!";
     }

@@ -12,5 +12,5 @@ import java.util.Optional;
 public interface RecompenseRepository extends CrudRepository<Recompense, Long> {
     Optional<Recompense> findByNom(String nom);
     Optional<Recompense> findById(Long id);
-    List<Recompense> findByUtilisateur(Utilisateur utilisateur);
+    List<Recompense> findByUser(Utilisateur user);
 }

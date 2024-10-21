@@ -9,6 +9,7 @@ import org.example.server.entity.Panier;
 import org.example.server.entity.PanierItem;
 import org.example.server.entity.Produit;
 import org.example.server.entity.Utilisateur;
+import org.example.server.repository.PanierItemRepository;
 import org.example.server.repository.PanierRepository;
 import org.example.server.repository.ProduitRepository;
 import org.example.server.repository.UtilisateurRepository;
@@ -19,6 +20,7 @@ import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Service
 public class PanierService {
@@ -30,6 +32,9 @@ public class PanierService {
 
     @Autowired
     private ProduitRepository produitRepository;
+
+    @Autowired
+    private PanierItemRepository panierItemRepository;
 
 
     public PanierDtoGet createPanier(PanierDtoPost dtoPost) {
@@ -98,5 +103,12 @@ public class PanierService {
 
         // Ajoutez d'autres mappages si nécessaire
         return dtoGet;
+    }
+
+    public List<Produit> getProduitsByPanierId(Long panierId) {
+        List<PanierItem> panierItems = panierItemRepository.findByPanierId(panierId);
+        return panierItems.stream()
+                .map(PanierItem::getProduit)
+                .collect(Collectors.toList());
     }
 }

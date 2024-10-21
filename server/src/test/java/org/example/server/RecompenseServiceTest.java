@@ -88,7 +88,7 @@ public class RecompenseServiceTest {
     public void getHistoriqueRecompenses_ShouldReturnListOfRecompenseDtoGet() {
         List<Recompense> recompenses = new ArrayList<>();
         recompenses.add(recompense);
-        lenient().when(recompenseRepository.findByUtilisateur(any(Utilisateur.class))).thenReturn(recompenses);
+        lenient().when(recompenseRepository.findByUser(any(Utilisateur.class))).thenReturn(recompenses);
         when(utilisateurRepository.findById(1L)).thenReturn(Optional.of(new Utilisateur()));
 
         List<RecompenseDtoGet> results = recompenseService.getHistoriqueRecompenses(1L);

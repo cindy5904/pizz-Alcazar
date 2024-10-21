@@ -4,8 +4,10 @@ import org.example.server.dto.panier.PanierDtoGet;
 import org.example.server.dto.panier.PanierDtoPost;
 import org.example.server.dto.panierItem.PanierItemDtoPost;
 import org.example.server.entity.Panier;
+import org.example.server.entity.PanierItem;
 import org.example.server.entity.Produit;
 import org.example.server.entity.Utilisateur;
+import org.example.server.repository.PanierItemRepository;
 import org.example.server.repository.PanierRepository;
 import org.example.server.repository.ProduitRepository;
 import org.example.server.repository.UtilisateurRepository;
@@ -15,11 +17,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -39,6 +43,9 @@ public class PanierserviceTest {
 
     @Mock
     private UtilisateurRepository utilisateurRepository;
+
+    @Mock
+    private PanierItemRepository panierItemRepository;
 
     @Mock
     private ProduitRepository produitRepository;
@@ -119,4 +126,35 @@ public class PanierserviceTest {
         assertNotNull(result);
         assertEquals(panier.getId(), result.getId());
     }
+
+    @Test
+    public void testGetProduitsByPanierId_Success() {
+        // Arrange
+        Long panierId = 1L;
+        Produit produit1 = new Produit();
+        produit1.setId(1L);
+        Produit produit2 = new Produit();
+        produit2.setId(2L);
+
+        PanierItem item1 = new PanierItem();
+        item1.setProduit(produit1);
+        item1.setPanier(new Panier()); // Juste pour satisfaire la relation
+
+        PanierItem item2 = new PanierItem();
+        item2.setProduit(produit2);
+        item2.setPanier(new Panier());
+
+        List<PanierItem> items = Arrays.asList(item1, item2);
+
+        Mockito.when(panierItemRepository.findByPanierId(panierId)).thenReturn(items);
+
+        // Act
+        List<Produit> result = panierService.getProduitsByPanierId(panierId);
+
+        // Assert
+        assertEquals(2, result.size());
+        assertEquals(produit1.getId(), result.get(0).getId());
+        assertEquals(produit2.getId(), result.get(1).getId());
+    }
+
 }

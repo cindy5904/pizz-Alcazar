@@ -39,10 +39,7 @@ public class RecompenseService {
         return convertToDtoGet(savedRecompense);
     }
 
-    /**
-     * Générer une récompense pour un utilisateur lorsqu'il atteint 100 points de fidélité.
-     * @param utilisateur l'utilisateur ayant accumulé les points.
-     */
+
     public void genererRecompensePourUtilisateur(Long utilisateurId) {
         Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId)
                 .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé"));
@@ -74,7 +71,7 @@ public class RecompenseService {
                 .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé"));
 
         // Récupérer toutes les récompenses de cet utilisateur
-        List<Recompense> recompenses = recompenseRepository.findByUtilisateur(utilisateur);
+        List<Recompense> recompenses = recompenseRepository.findByUser(utilisateur);
 
         // Convertir en DTO
         return recompenses.stream()

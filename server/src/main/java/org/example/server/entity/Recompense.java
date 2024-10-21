@@ -1,9 +1,6 @@
 package org.example.server.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -25,4 +22,7 @@ public class Recompense {
     private int pointsNecessaires;
     private LocalDate dateRemise;
     private String codeRemise;
+    @ManyToOne
+    @JoinColumn(name = "user_id")  // Assurez-vous que cette colonne existe dans votre table
+    private Utilisateur user;
 }

@@ -15,13 +15,8 @@ public interface HistoriqueFideliteRepository extends CrudRepository<HistoriqueF
 
     // Recherche un historique de fidélité par ID
     Optional<HistoriqueFidelite> findById(Long id);
-    List<HistoriqueFidelite> findByUserIdAndDateTransactionBetween(Long userId, LocalDateTime startDate, LocalDateTime endDate);
-    List<HistoriqueFidelite> findByUserIdAndTypeTransaction(Long userId, String typeTransaction);
+
 
     List<HistoriqueFidelite> findByDateTransactionBetween(LocalDateTime startDate, LocalDateTime endDate);
-
-
-
-
 
 }

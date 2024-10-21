@@ -16,4 +16,5 @@ public interface PanierItemRepository extends CrudRepository<PanierItem, Long> {
 
     // Supprime un item de panier par produit et panier
     void deleteByProduitIdAndPanierId(Long produitId, Long panierId);
+
 }

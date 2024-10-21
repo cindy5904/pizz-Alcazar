@@ -1,5 +1,6 @@
 package org.example.server.repository;
 
+import org.example.server.entity.Categorie;
 import org.example.server.entity.Produit;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
@@ -20,4 +21,5 @@ public interface ProduitRepository extends CrudRepository<Produit, Long> {
 
     // Récupérer un produit par son ID
     Optional<Produit> findById(Long id);
+    List<Produit> findByCategorie(Categorie categorie);
 }

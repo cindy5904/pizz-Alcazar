@@ -14,11 +14,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -160,5 +162,27 @@ public class HistoriqueFideliteServiceTest {
         long totalRecompenses = historiqueFideliteService.countRecompensesParMois(2024, 10);
         assertEquals(2, totalRecompenses); // Vérifiez que le total est correct
     }
+
+    @Test
+    public void testFindByUserId_Success() {
+        // Arrange
+        Long userId = 1L;
+        HistoriqueFidelite historique = new HistoriqueFidelite();
+        historique.setId(1L);
+        historique.setUser(new Utilisateur());
+
+        List<HistoriqueFidelite> historiques = Arrays.asList(historique);
+
+        // Simuler le comportement de historiqueFideliteRepository
+        Mockito.when(historiqueFideliteRepository.findByUserId(userId)).thenReturn(historiques);
+
+        // Act
+        List<HistoriqueFidelite> result = historiqueFideliteService.findByUserId(userId);
+
+        // Assert
+        assertEquals(1, result.size());
+        assertEquals(historique.getId(), result.get(0).getId());
+    }
+
 
 }

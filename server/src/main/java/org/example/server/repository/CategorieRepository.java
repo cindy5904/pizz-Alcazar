@@ -13,5 +13,7 @@ public interface CategorieRepository extends CrudRepository<Categorie, Long> {
     Optional<Categorie> findById(Long id);
     Optional<Categorie> findByNom(String nom);
     Boolean existsByNom(String nom);
-    List<Produit> findProduitsByCategorieId(Long categorieId);
+    List<Produit> findByProduits_Categorie(Categorie categorie);
+
+
 }
