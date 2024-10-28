@@ -16,4 +16,5 @@ public class ProduitDtoGet {
     private double prix;
     private boolean disponibilite;
     private String categorieNom;
+    private String imagePath;
 }

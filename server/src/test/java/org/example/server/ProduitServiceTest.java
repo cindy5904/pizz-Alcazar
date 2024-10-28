@@ -15,6 +15,7 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.springframework.context.annotation.Import;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -74,8 +75,13 @@ public class ProduitServiceTest {
         // Simuler la sauvegarde du produit
         when(produitRepository.save(any(Produit.class))).thenReturn(produit);
 
-        // Appeler la méthode à tester
-        ProduitDtoGet produitDtoGet = produitService.creerProduit(produitDtoPost);
+        // Créer un mock de MultipartFile pour l'image
+        MultipartFile imageFile = mock(MultipartFile.class);
+        when(imageFile.getOriginalFilename()).thenReturn("testImage.jpg");
+        when(imageFile.isEmpty()).thenReturn(false);
+
+        // Appeler la méthode à tester avec le fichier image
+        ProduitDtoGet produitDtoGet = produitService.creerProduit(produitDtoPost, imageFile);
 
         // Vérifier les résultats
         assertNotNull(produitDtoGet);
@@ -84,10 +90,15 @@ public class ProduitServiceTest {
         assertEquals(produitDtoGet.getPrix(), produit.getPrix(), 0.0001);
         assertEquals(produitDtoGet.isDisponibilite(), produit.isDisponibilite());
 
+        // Vérifier que le chemin de l'image a été mis à jour dans le DTO
+        assertEquals("/images/testImage.jpg", produitDtoGet.getImagePath());
+
         // Vérifier les interactions avec les dépendances
         verify(categorieRepository, times(1)).findById(produitDtoPost.getCategorieId());
         verify(produitRepository, times(1)).save(any(Produit.class));
     }
+
+
 
     @Test
     public void testMettreAJourProduit_Succes() {
@@ -98,8 +109,13 @@ public class ProduitServiceTest {
         // Simuler la sauvegarde du produit mis à jour
         when(produitRepository.save(any(Produit.class))).thenReturn(produit);
 
-        // Appeler la méthode à tester
-        ProduitDtoGet produitDtoGet = produitService.mettreAJourProduit(1L, produitDtoPost);
+        // Créer un mock de MultipartFile pour l'image
+        MultipartFile imageFile = mock(MultipartFile.class);
+        when(imageFile.getOriginalFilename()).thenReturn("testImage.jpg");
+        when(imageFile.isEmpty()).thenReturn(false);
+
+        // Appeler la méthode à tester avec l'image
+        ProduitDtoGet produitDtoGet = produitService.mettreAJourProduit(1L, produitDtoPost, imageFile);
 
         // Vérifier les résultats
         assertNotNull(produitDtoGet);
@@ -107,11 +123,16 @@ public class ProduitServiceTest {
         assertEquals(produitDtoGet.getDescription(), produit.getDescription());
         assertEquals(produitDtoGet.getPrix(), produit.getPrix(), 0.0001);
 
+        // Vérifier que le chemin de l'image a été mis à jour dans le DTO
+        assertEquals("/images/testImage.jpg", produitDtoGet.getImagePath());
+
         // Vérifier les interactions avec les dépendances
         verify(produitRepository, times(1)).findById(1L);
         verify(categorieRepository, times(1)).findById(produitDtoPost.getCategorieId());
         verify(produitRepository, times(1)).save(any(Produit.class));
     }
+
+
 
     @Test
     public void testGetProduitById_Succes() {

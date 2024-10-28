@@ -1,0 +1,128 @@
+.navbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 20px;
+    background-color: #f9f9f9;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+    position: relative; /* Permet de gérer l'alignement du contenu */
+}
+
+/* Conteneur pour centrer les liens */
+.container-nav-link {
+    display: flex;
+    justify-content: center;
+    flex-grow: 1; /* S'étend pour prendre tout l'espace */
+    margin-right: auto; /* Pousse les actions vers la droite */
+}
+
+/* Style des liens */
+.nav-links {
+    display: flex;
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li {
+    margin: 0 15px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #4e6026;
+    font-weight: bold;
+    font-size: 18px;
+}
+
+/* Section pour "Mon compte" et le panier */
+.nav-actions {
+    display: flex;
+    align-items: center;
+    margin-left: auto; /* Pousse cette section à droite */
+    
+}
+
+/* Ajout de marges et espace supplémentaire */
+.nav-actions a {
+    text-decoration: none;
+    color: #4e6026;
+    margin-right: 15px;
+    font-weight: bold;
+    white-space: nowrap; /* Évite que "Mon compte" passe sur deux lignes */
+    font-size: 18px;
+}
+
+/* Style du panier */
+.nav-actions .cart-icon {
+    font-size: 22px;
+    color: #4e6026;
+    padding-right: 10px; /* Espace entre "Mon compte" et l'icône de panier */
+    cursor: pointer;
+}
+a:hover {
+    color: #8cbf3f; /* Couleur au survol de la souris */
+    text-decoration: underline; /* Ajoute un soulignement au survol */
+}
+
+.burger-menu {
+    display: none;
+    cursor: pointer;
+    flex-direction: column;
+    justify-content: space-around;
+    height: 20px;
+}
+
+/* Style des barres du burger */
+.burger-menu span {
+    width: 25px;
+    height: 3px;
+    background-color: #4e6026;
+    margin: 3px 0;
+}
+.logout-icon:hover {
+    color: red; /* Changez la couleur lors du survol */
+}
+
+.user-icon:hover, .panier-icon:hover {
+    color: #8cbf3f;
+}
+
+/* Styles pour les petits écrans */
+@media (max-width: 768px) {
+    .navbar {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    /* Masquer les liens par défaut */
+    .nav-links {
+        flex-direction: column;
+        display: none;
+        width: 100%;
+        align-items: center; /* Centrer les éléments du menu */
+    }
+
+    .nav-links.open {
+        display: flex;
+    }
+
+    /* Masquer "Mon compte" et le panier par défaut */
+    .nav-actions {
+        display: none;
+    }
+
+    /* Afficher "Mon compte" et le panier quand le menu est ouvert */
+    .nav-actions.open {
+        display: flex;
+        justify-content: center; /* Centrer ces éléments en mode mobile */
+        width: 100%;
+        margin-top: 10px;
+    }
+
+    /* Afficher le menu burger */
+    .burger-menu {
+        display: flex;
+        margin-left: auto;
+    }
+}

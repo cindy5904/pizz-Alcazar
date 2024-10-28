@@ -23,7 +23,7 @@ public class CategorieService {
     private ProduitRepository produitRepository;
 
     // Mapper de Categorie vers CategorieDtoGet
-    private CategorieDtoGet mapToDtoGet(Categorie categorie) {
+    public CategorieDtoGet mapToDtoGet(Categorie categorie) {
         CategorieDtoGet dto = new CategorieDtoGet();
         dto.setId(categorie.getId());
         dto.setNom(categorie.getNom());
@@ -82,10 +82,5 @@ public class CategorieService {
         Categorie categorie = getCategorieById(categorieId); // Obtenez d'abord la catégorie par ID
         return produitRepository.findByCategorie(categorie); // Utilisez l'instance de catégorie pour rechercher les produits
     }
-
-
-
-
-
 
 }

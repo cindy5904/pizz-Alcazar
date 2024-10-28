@@ -16,4 +16,5 @@ public class LoginDto {
 
     @NotBlank(message = "Le mot de passe est obligatoire")
     private String motDePasse;
+    private String Prenom;
 }

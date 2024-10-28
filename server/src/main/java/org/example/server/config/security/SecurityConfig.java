@@ -4,6 +4,7 @@ import org.example.server.config.jwt.JwtAuthenticationEntryPoint;
 import org.example.server.config.jwt.JwtRequestFilter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -54,7 +55,13 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**").permitAll()
-                        .requestMatchers("/**").authenticated()
+                        .requestMatchers(HttpMethod.GET, "/api/produits/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
+                        // Restreindre la création, modification, et suppression aux admins
+                        .requestMatchers(HttpMethod.POST, "/api/produits/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/produits/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/produits/**").hasRole("ADMIN")
+
                 )
                 .addFilterBefore(jwtRequestFilter(), UsernamePasswordAuthenticationFilter.class);
 
@@ -66,7 +73,7 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:3000"));  // Allow requests from frontend
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));  // Allow requests from frontend
         configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));  // Allow these methods
         configuration.setAllowedHeaders(Arrays.asList("*"));  // Allow all headers
         configuration.setAllowCredentials(true);  // Allow credentials (e.g., cookies)

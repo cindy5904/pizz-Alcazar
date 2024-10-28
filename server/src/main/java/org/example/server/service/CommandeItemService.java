@@ -21,107 +21,91 @@ public class CommandeItemService {
     private CommandeItemRepository commandeItemRepository;
 
     @Autowired
-    private CommandeRepository commandeRepository; // Ajoute le repository pour Commande
+    private CommandeRepository commandeRepository;
 
     @Autowired
     private ProduitRepository produitRepository;
 
     public CommandeItemDtoGet createCommandeItem(CommandeItemDtoPost itemDto) {
-        // Vérifie si la commande existe
+        // Validation des entrées
         if (itemDto.getProduitId() == null) {
-            throw new ResourceNotFoundException("Produit not found");
+            throw new ResourceNotFoundException("Produit non trouvé");
         }
 
-        // Vérifie si le produit existe
         if (!produitRepository.existsById(itemDto.getProduitId())) {
-            throw new ResourceNotFoundException("Produit not found");
+            throw new ResourceNotFoundException("Produit non trouvé");
         }
 
-        // Crée un nouvel objet CommandeItem
+        // Vérification de la commande associée
+        Commande commande = null;
+        if (itemDto.getCommandeId() != null) {
+            commande = commandeRepository.findById(itemDto.getCommandeId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Commande non trouvée"));
+        }
+
+        // Vérification de l'unicité du produit dans la commande
+        if (commande != null && existsByCommandeIdAndProduitId(commande.getId(), itemDto.getProduitId())) {
+            throw new IllegalArgumentException("Produit déjà présent dans cette commande");
+        }
+
+        // Création d'un nouvel objet CommandeItem
         CommandeItem commandeItem = new CommandeItem();
         commandeItem.setQuantite(itemDto.getQuantite());
+        commandeItem.setCommande(commande);
+        commandeItem.setProduit(produitRepository.findById(itemDto.getProduitId())
+                .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé")));
 
-        // Récupère la commande associée si nécessaire
-        if (itemDto.getCommandeId() != null) {
-            Commande commande = commandeRepository.findById(itemDto.getCommandeId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Commande not found"));
-            commandeItem.setCommande(commande);
-        }
-
-        // Associe le produit au CommandeItem
-        Produit produit = produitRepository.findById(itemDto.getProduitId())
-                .orElseThrow(() -> new ResourceNotFoundException("Produit not found"));
-        commandeItem.setProduit(produit);
-
-        // Enregistre le CommandeItem dans la base de données
+        // Enregistrement dans la base de données
         CommandeItem savedItem = commandeItemRepository.save(commandeItem);
 
-        // Convertit et retourne le CommandeItem en DTO
         return convertToDto(savedItem);
     }
 
-
-    // Méthode pour mettre à jour un CommandeItem
     public CommandeItemDtoGet updateCommandeItem(Long id, CommandeItemDtoPost itemDto) {
-        if (!commandeItemRepository.existsById(id)) {
-            throw new ResourceNotFoundException("CommandeItem not found with id: " + id);
-        }
-
+        // Vérification de l'existence de CommandeItem
         CommandeItem commandeItem = commandeItemRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("CommandeItem not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("CommandeItem non trouvé avec l'id : " + id));
 
-        // Vérifie la disponibilité du produit
+        // Vérification de la disponibilité du produit
         if (itemDto.getProduitId() != null) {
             if (!produitRepository.existsById(itemDto.getProduitId())) {
-                throw new ResourceNotFoundException("Produit not found");
+                throw new ResourceNotFoundException("Produit non trouvé");
             }
-            Produit produit = produitRepository.findById(itemDto.getProduitId())
-                    .orElseThrow(() -> new ResourceNotFoundException("Produit not found"));
-            commandeItem.setProduit(produit);
+            commandeItem.setProduit(produitRepository.findById(itemDto.getProduitId())
+                    .orElseThrow(() -> new ResourceNotFoundException("Produit non trouvé")));
         }
 
-        // Met à jour la quantité
         commandeItem.setQuantite(itemDto.getQuantite());
-
-        // Enregistre les modifications
         CommandeItem updatedItem = commandeItemRepository.save(commandeItem);
-
-        // Convertit et retourne le CommandeItem en DTO
         return convertToDto(updatedItem);
     }
 
-    // Méthode pour obtenir un CommandeItem par ID
     public CommandeItemDtoGet getCommandeItemById(Long id) {
         CommandeItem commandeItem = commandeItemRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("CommandeItem not found with id: " + id));
+                .orElseThrow(() -> new ResourceNotFoundException("CommandeItem non trouvé avec l'id : " + id));
         return convertToDto(commandeItem);
     }
 
-    // Méthode pour obtenir les éléments par ID de commande
     public List<CommandeItemDtoGet> getItemsByCommandeId(Long commandeId) {
         List<CommandeItem> items = commandeItemRepository.findByCommandeId(commandeId);
         return items.stream().map(this::convertToDto).collect(Collectors.toList());
     }
 
-    // Méthode pour supprimer un CommandeItem par ID
     public void deleteCommandeItem(Long id) {
         if (!commandeItemRepository.existsById(id)) {
-            throw new ResourceNotFoundException("CommandeItem not found with id: " + id);
+            throw new ResourceNotFoundException("CommandeItem non trouvé avec l'id : " + id);
         }
         commandeItemRepository.deleteById(id);
     }
 
-    // Vérifie si un produit existe
     public boolean existsByProduitId(Long produitId) {
         return commandeItemRepository.existsByProduitId(produitId);
     }
 
-    // Vérifie si une commande contient un produit
     public boolean existsByCommandeIdAndProduitId(Long commandeId, Long produitId) {
         return commandeItemRepository.existsByCommandeIdAndProduitId(commandeId, produitId);
     }
 
-    // Convertit CommandeItem en CommandeItemDtoGet
     private CommandeItemDtoGet convertToDto(CommandeItem commandeItem) {
         CommandeItemDtoGet dto = new CommandeItemDtoGet();
         dto.setId(commandeItem.getId());
@@ -130,7 +114,6 @@ public class CommandeItemService {
         dto.setProduitNom(commandeItem.getProduit().getNom());
         dto.setProduitPrix(commandeItem.getProduit().getPrix());
 
-        // Ajouter l'ID de la commande si nécessaire
         if (commandeItem.getCommande() != null) {
             dto.setCommandeId(commandeItem.getCommande().getId());
         }

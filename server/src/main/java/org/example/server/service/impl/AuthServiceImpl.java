@@ -14,8 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.InternalAuthenticationServiceException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -70,13 +72,24 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
     @Override
     public String login(LoginDto loginDto) {
-        Authentication authentication = authenticationManager.authenticate(
-                new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getMotDePasse())
-        );
+        try {
+            Authentication authentication = authenticationManager.authenticate(
+                    new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getMotDePasse())
+            );
 
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-        return jwtTokenProvider.generateToken(authentication);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+            return jwtTokenProvider.generateToken(authentication);
+        } catch (InternalAuthenticationServiceException e) {
+            // Log the error
+            System.out.println("InternalAuthenticationServiceException: " + e.getMessage());
+            throw e;  // Rethrow to let Spring handle it
+        } catch (AuthenticationException e) {
+            // Log the error
+            System.out.println("AuthenticationException: " + e.getMessage());
+            throw e;  // Rethrow to let Spring handle it
+        }
     }
+
 
     @Override
     public Long getIdByEmail(String email) {

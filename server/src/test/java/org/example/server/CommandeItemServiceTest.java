@@ -241,4 +241,25 @@ public class CommandeItemServiceTest {
         assertTrue(exists);
     }
 
+
+    @Test
+    public void testUpdateCommandeItem_NoProductId() {
+        CommandeItemDtoPost itemDto = new CommandeItemDtoPost();
+        itemDto.setQuantite(4); // Nouvelle quantité
+        itemDto.setProduitId(null); // Pas de produit
+
+        // Simulez la présence de la commande
+        when(commandeItemRepository.existsById(1L)).thenReturn(true);
+        when(commandeItemRepository.findById(1L)).thenReturn(Optional.of(commandeItem));
+
+        // Appel de la méthode sous test
+        CommandeItemDtoGet updatedItem = commandeItemService.updateCommandeItem(1L, itemDto);
+
+        // Vérifiez que le produit n'a pas été modifié
+        assertEquals(produit.getId(), updatedItem.getProduitId());
+        assertEquals(4, updatedItem.getQuantite());
+    }
+
+
+
 }

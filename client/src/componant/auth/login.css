@@ -1,0 +1,77 @@
+/* Login.css */
+
+.login-container {
+    max-width: 400px; /* Largeur adaptée pour le formulaire de connexion */
+    margin: 60px auto; /* Centré avec un espace supérieur pour le header */
+    padding: 25px; /* Espace intérieur */
+    background-color: #fefefe; /* Fond clair */
+    border-radius: 8px; /* Coins légèrement arrondis */
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Ombre douce */
+}
+
+h2 {
+    text-align: center; /* Centre le titre */
+    color: #c0392b; /* Rouge italien */
+    font-family: 'Arial', sans-serif; /* Police simple et moderne */
+    margin-bottom: 20px; /* Espace en bas */
+}
+
+.login-form {
+    display: flex;
+    flex-direction: column; /* Organisation en colonne */
+}
+
+.form-group {
+    margin-bottom: 18px; /* Espacement entre les champs */
+}
+
+label {
+    font-weight: bold; /* Texte en gras pour les étiquettes */
+    color: #333; /* Couleur de l’étiquette */
+    margin-bottom: 5px; /* Espace sous l’étiquette */
+    display: block; /* Force le label à occuper toute la ligne */
+}
+
+input {
+    padding: 12px; /* Espace intérieur du champ */
+    border: 1px solid #ccc; /* Bordure claire */
+    border-radius: 5px; /* Coins arrondis */
+    font-size: 16px;
+    transition: border-color 0.3s; /* Transition douce */
+    width: 100%; /* Largeur du champ */
+}
+
+input:focus {
+    border-color: #c0392b; /* Bordure rouge italienne au focus */
+    outline: none;
+}
+
+.submit-button {
+    background-color: #c0392b;
+    color: white;
+    padding: 12px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    font-size: 16px;
+    margin-top: 15px; /* Espace supérieur */
+    transition: background-color 0.3s;
+}
+
+.submit-button:hover {
+    background-color: #e74c3c; /* Rouge plus clair au survol */
+}
+
+.error {
+    color: #e74c3c; /* Texte rouge pour les erreurs */
+    font-size: 14px;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+/* Responsive design pour les petits écrans */
+@media (max-width: 768px) {
+    .login-container {
+        padding: 20px; /* Ajustement du padding sur petits écrans */
+    }
+}

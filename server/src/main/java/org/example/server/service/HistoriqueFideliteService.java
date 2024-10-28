@@ -71,7 +71,7 @@ public class HistoriqueFideliteService {
 
 
     // Convertisseur pour DTO
-    private HistoriqueFideliteDtoGet convertToDto(HistoriqueFidelite historique) {
+    public HistoriqueFideliteDtoGet convertToDto(HistoriqueFidelite historique) {
         HistoriqueFideliteDtoGet dto = new HistoriqueFideliteDtoGet();
         dto.setId(historique.getId());
         dto.setUserId(historique.getUser().getId());

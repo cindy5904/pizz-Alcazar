@@ -15,4 +15,5 @@ public class ProduitDtoPost {
     private double prix;
     private boolean disponibilite;
     private Long categorieId;
+    private String imagePath;
 }

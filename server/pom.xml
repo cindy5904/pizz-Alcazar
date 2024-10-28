@@ -48,6 +48,12 @@
 			<version>3.0.0</version> <!-- Ou la version la plus récente -->
 		</dependency>
 		<dependency>
+			<groupId>com.stripe</groupId>
+			<artifactId>stripe-java</artifactId>
+			<version>24.2.0</version> <!-- Vérifiez si une version plus récente est disponible -->
+		</dependency>
+
+		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
 			<version>6.2.0.Final</version> <!-- Ou la version la plus récente -->

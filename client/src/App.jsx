@@ -1,35 +1,27 @@
 import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
 import './App.css'
+import Navbar from './shared/navbar/Navbar';
+import { RouterProvider } from 'react-router-dom';
+import { checkUser } from './componant/auth/authSlice';
+import { useDispatch, useSelector } from 'react-redux';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const dispatch = useDispatch();
+    const user = useSelector((state) => state.auth.user);
 
-  return (
-    <>
-      <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    useEffect(() => {
+        dispatch(checkUser());
+    }, [dispatch]);
+
+    // Vérifiez que le user est mis à jour dans le store après chaque dispatch
+    console.log("État utilisateur dans App après checkUser:", user);
+
+    return (
+        <div>
+            <Navbar user={user} />
+            <RouterProvider router={router} />
+        </div>
+    );
 }
 
 export default App

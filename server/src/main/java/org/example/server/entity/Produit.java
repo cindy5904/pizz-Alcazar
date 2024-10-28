@@ -22,6 +22,7 @@ public class Produit {
     private String description;
     private double prix;
     private boolean disponibilite;
+    private String imagePath;
     @ManyToOne
     @JoinColumn(name = "categories_id")
     private Categorie categorie;

@@ -16,3 +16,17 @@ VALUES (
            (SELECT id FROM roles WHERE name = 'ROLE_ADMIN')
        )
     ON DUPLICATE KEY UPDATE user_id = user_id;
+
+-- Mettre à jour le mot de passe de l'utilisateur admin
+UPDATE users
+SET mot_de_passe = '$2y$10$Qp.G.Xrk7shKpEH.SjfSDePz4AhZKrjMtl5QIswEj92mIoZH8nWPC',
+    points_fidelite = 0 -- Remplacez par le mot de passe encodé approprié
+WHERE email = 'admin@pizzeria.com';
+
+INSERT INTO categories (nom)
+VALUES
+    ('Pizza'),
+    ('Pasta'),
+    ('Dessert'),
+    ('Boisson');
+

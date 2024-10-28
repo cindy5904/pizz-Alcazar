@@ -31,6 +31,7 @@ public class AuthController {
         return new ResponseEntity<>(token, HttpStatus.OK);
     }
 
+
     // Endpoint pour se déconnecter (logout)
     @PostMapping("/logout")
     public ResponseEntity<String> logoutUser() {
