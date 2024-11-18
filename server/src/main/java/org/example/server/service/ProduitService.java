@@ -60,24 +60,37 @@ public class ProduitService {
                     .orElseThrow(() -> new EntityNotFoundException("Catégorie non trouvée"));
             produit.setCategorie(categorie);
         }
-        produit.setImagePath(dtoPost.getImagePath());
+        produit.setImagePath(dtoPost.getImagePath()); // Peut être null sans problème
 
         return produit;
     }
 
+
     // Créer un produit
     public ProduitDtoGet creerProduit(ProduitDtoPost dtoPost, MultipartFile imageFile) {
-        String imagePath = saveImage(imageFile);
+        System.out.println("Image reçue dans le service : " + (imageFile != null ? imageFile.getOriginalFilename() : "Aucune image"));
+        String imagePath = null;
+        if (imageFile != null && !imageFile.isEmpty()) {
+            imagePath = saveImage(imageFile);
+            System.out.println("Chemin de l'image généré : " + imagePath);
+        }
         dtoPost.setImagePath(imagePath);
         Produit produit = mapToEntity(dtoPost);
         produitRepository.save(produit);
+        System.out.println("Chemin de l'image sauvegardé dans produit : " + produit.getImagePath());
         return mapToDtoGet(produit);
     }
 
+
+
     // Mettre à jour un produit
     public ProduitDtoGet mettreAJourProduit(Long produitId, ProduitDtoPost dtoPost,  MultipartFile imageFile) {
+        System.out.println("Mise à jour du produit ID: " + produitId);
+        System.out.println("Données du produit: " + dtoPost);
+        System.out.println("Image reçue: " + (imageFile != null ? imageFile.getOriginalFilename() : "Aucune image"));
         Produit produit = produitRepository.findById(produitId)
                 .orElseThrow(() -> new EntityNotFoundException("Produit non trouvé"));
+        System.out.println("Produit avant mise à jour: " + produit);
 
         produit.setNom(dtoPost.getNom());
         produit.setDescription(dtoPost.getDescription());
@@ -93,9 +106,13 @@ public class ProduitService {
         if (imageFile != null && !imageFile.isEmpty()) {
             String imagePath = saveImage(imageFile);  // Sauvegarder la nouvelle image et obtenir le chemin
             produit.setImagePath(imagePath); // Mettre à jour le chemin de l'image
+            System.out.println("Nouvelle image sauvegardée : " + imagePath);
         }
+        System.out.println("Produit après mise à jour: " + produit.getId() + ", Nom: " + produit.getNom());
 
+        System.out.println("Produit avant sauvegarde : " + produit.getId());
         produitRepository.save(produit);
+        System.out.println("Produit sauvegardé avec succès.");
         return mapToDtoGet(produit);
     }
 
@@ -139,19 +156,23 @@ public class ProduitService {
 
     private String saveImage(MultipartFile imageFile) {
         try {
-            // Nom du fichier
-            String fileName = imageFile.getOriginalFilename();
+            String originalFileName = imageFile.getOriginalFilename();
+            String fileName = originalFileName.replaceAll("[^a-zA-Z0-9\\.\\-]", "_");
 
-            // Chemin d'accès complet pour stocker l'image
-            Path imagePath = Paths.get("uploads/images/" + fileName);
+            Path uploadPath = Paths.get("uploads/images");
+            if (!Files.exists(uploadPath)) {
+                Files.createDirectories(uploadPath);
+                System.out.println("Répertoire créé : " + uploadPath.toAbsolutePath());
+            }
 
-            // Copier le fichier dans le dossier de destination
+            Path imagePath = uploadPath.resolve(fileName);
             Files.copy(imageFile.getInputStream(), imagePath, StandardCopyOption.REPLACE_EXISTING);
-
-            // Retourner le chemin d'accès de l'image pour stockage en base de données ou affichage
+            System.out.println("Image sauvegardée à : " + imagePath.toAbsolutePath());
             return "/images/" + fileName;
-        } catch (Exception e) {
+        } catch (IOException e) {
             throw new RuntimeException("Échec de l'enregistrement de l'image", e);
         }
     }
+
+
 }

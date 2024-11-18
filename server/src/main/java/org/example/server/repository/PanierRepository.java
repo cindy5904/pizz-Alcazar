@@ -11,5 +11,7 @@ import java.util.Optional;
 @Repository
 public interface PanierRepository extends CrudRepository<Panier, Long> {
     Optional<Panier> findByUserId(Long userId);
+    Optional<Panier> findByUserIdAndActifTrue(Long userId);
+
 
 }

@@ -18,6 +18,7 @@ public class PanierDtoGet {
     private Long id;
     private LocalDate dateCreation;
     private LocalDate dateModification;
+    private boolean actif;
     private UtilisateurDtoGet user;
     private List<PanierItemDtoGet> itemsPanier;
 }

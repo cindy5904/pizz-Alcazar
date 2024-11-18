@@ -10,7 +10,7 @@ import store from '../src/store/store.js'
 createRoot(document.getElementById('root')).render(
   <StrictMode>
     <Provider store={store}>
-    <RouterProvider router={router} />
+    <App />
     </Provider>
   </StrictMode>,
 )

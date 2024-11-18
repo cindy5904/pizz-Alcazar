@@ -21,9 +21,9 @@ public class CommandeDtoGet {
     private String adresseLivraison;
     private String telephone;
     private String typeLivraison;
-    private Long userId;    // L'ID de l'utilisateur qui a passé la commande
-    private Long panierId;   // L'ID du panier lié à la commande
+    private Long userId;
+    private Long panierId;
 
-    private List<CommandeItemDtoGet> itemsCommande; // Liste des items de la commande
+    private List<CommandeItemDtoGet> itemsCommande;
     private Long paiementId;
 }

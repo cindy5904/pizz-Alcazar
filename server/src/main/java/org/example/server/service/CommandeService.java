@@ -5,6 +5,7 @@ import org.example.server.dto.commande.CommandeDtoGet;
 import org.example.server.dto.commande.CommandeDtoPost;
 import org.example.server.dto.commandeItem.CommandeItemDtoGet;
 import org.example.server.entity.Commande;
+import org.example.server.entity.CommandeItem;
 import org.example.server.entity.Panier;
 import org.example.server.entity.Utilisateur;
 import org.example.server.enums.EtatCommande;
@@ -14,6 +15,7 @@ import org.example.server.repository.PaiementRepository;
 import org.example.server.repository.PanierRepository;
 import org.example.server.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -37,47 +39,65 @@ public class CommandeService {
     public CommandeDtoGet convertToDto(Commande commande) {
         CommandeDtoGet dto = new CommandeDtoGet();
         dto.setId(commande.getId());
-        dto.setDetailsCommande(commande.getDetailsCommande()); // Assurez-vous que ceci est bien défini
+        dto.setDetailsCommande(commande.getDetailsCommande());
         dto.setStatut(commande.getStatut());
         dto.setAdresseLivraison(commande.getAdresseLivraison());
         dto.setTelephone(commande.getTelephone());
         dto.setTypeLivraison(commande.getTypeLivraison());
 
         if (commande.getUser() != null) {
-            dto.setUserId(commande.getUser().getId()); // Assurez-vous que l'utilisateur est bien lié
+            dto.setUserId(commande.getUser().getId());
         }
 
         if (commande.getPanier() != null) {
-            dto.setPanierId(commande.getPanier().getId()); // Assurez-vous que le panier est bien lié
+            dto.setPanierId(commande.getPanier().getId());
         }
+
+        List<CommandeItemDtoGet> itemsDto = commande.getItemsCommande().stream()
+                .map(this::convertCommandeItemToDto)
+                .collect(Collectors.toList());
+        dto.setItemsCommande(itemsDto);
 
         return dto;
     }
 
-
+    private CommandeItemDtoGet convertCommandeItemToDto(CommandeItem item) {
+        CommandeItemDtoGet dto = new CommandeItemDtoGet();
+        dto.setId(item.getId());
+        dto.setQuantite(item.getQuantite());
+        dto.setProduitId(item.getProduit().getId());
+        dto.setProduitNom(item.getProduit().getNom());
+        dto.setProduitPrix(item.getProduit().getPrix());
+        return dto;
+    }
 
     public CommandeDtoGet createCommande(CommandeDtoPost commandeDto) {
         Commande commande = new Commande();
-        commande.setDetailsCommande(commandeDto.getDetailsCommande()); // Assurez-vous que ceci est bien défini
-        commande.setStatut(commandeDto.getStatut()); // Assurez-vous que le statut est défini
+        commande.setDetailsCommande(commandeDto.getDetailsCommande());
+        commande.setStatut(commandeDto.getStatut());
 
-        // Récupérer l'utilisateur
         Utilisateur utilisateur = utilisateurRepository.findById(commandeDto.getUserId())
                 .orElseThrow(() -> new ResourceNotFoundException("Utilisateur non trouvé avec l'ID: " + commandeDto.getUserId()));
-        commande.setUser(utilisateur); // Lier l'utilisateur à la commande
+        commande.setUser(utilisateur);
 
-        // Récupérer le panier si nécessaire
         Panier panier = panierRepository.findById(commandeDto.getPanierId())
                 .orElseThrow(() -> new ResourceNotFoundException("Panier non trouvé avec l'ID: " + commandeDto.getPanierId()));
-        commande.setPanier(panier); // Lier le panier à la commande
+        commande.setPanier(panier);
 
-        // Ajoutez d'autres champs si nécessaire
-        commande.setAdresseLivraison(commandeDto.getAdresseLivraison());
-        commande.setTelephone(commandeDto.getTelephone());
-
+        List<CommandeItem> itemsCommande = panier.getItemsPanier().stream().map(panierItem -> {
+            CommandeItem commandeItem = new CommandeItem();
+            commandeItem.setProduit(panierItem.getProduit());
+            commandeItem.setQuantite(panierItem.getQuantite());
+            commandeItem.setCommande(commande);
+            return commandeItem;
+        }).collect(Collectors.toList());
+        commande.setItemsCommande(itemsCommande);
         Commande savedCommande = commandeRepository.save(commande);
+        panier.setActif(false);
+        panierRepository.save(panier);
         return convertToDto(savedCommande);
     }
+
 
 
     public CommandeDtoGet getCommandeById(Long id) {
@@ -86,11 +106,13 @@ public class CommandeService {
         return convertToDto(commande);
     }
 
-    public List<CommandeDtoGet> getAllCommandes() {
-        return StreamSupport.stream(commandeRepository.findAll().spliterator(), false)
+    public List<CommandeDtoGet> getAllCommandes(Pageable pageable) {
+        return commandeRepository.findAll(pageable)
+                .stream()
                 .map(this::convertToDto)
                 .collect(Collectors.toList());
     }
+
 
     public void deleteCommande(Long id) {
         if (!commandeRepository.existsById(id)) {
@@ -153,4 +175,5 @@ public class CommandeService {
         // Déduire 100 points après application de la remise
         utilisateur.setPointsFidelite(utilisateur.getPointsFidelite() - 100);
     }
+
 }

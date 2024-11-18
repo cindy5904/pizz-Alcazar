@@ -1,17 +1,21 @@
 import React, { useState } from 'react';
 import '../navbar/navbar.css'; 
 import { FaUser, FaSignOutAlt,FaShoppingCart } from 'react-icons/fa';
-import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
+import { logoutUser } from '../../componant/auth/authSlice';
+import Header from '../header/Header';
 
 const Navbar = () => {
   
     const [isOpen, setIsOpen] = useState(false);
     const user = useSelector((state) => state.auth.user);
+    const dispatch = useDispatch();
     console.log('User dans Navbar:', user);
+
     const handleLogout = () => {
-        dispatch(logoutUser()); // Appeler l'action de déconnexion
-        localStorage.removeItem('token'); // Supprimer le token du localStorage
+        dispatch(logoutUser());
+        localStorage.removeItem('token');
     };
 
   
@@ -20,6 +24,7 @@ const Navbar = () => {
     };
   
     return (
+      <>
       <nav className="navbar">
         <div className="container-nav-link">
         <ul className={`nav-links ${isOpen ? 'open' : ''}`}>
@@ -28,19 +33,21 @@ const Navbar = () => {
           <li><a href="#about">About</a></li>
           <li><a href="#contact">Contact</a></li>
           <li><Link to="/produits/ajouter">Ajouter un produit</Link></li>
+          <li><Link to="/produits">Produit</Link></li>
+          <li><Link to="/categories">Cat</Link></li>
         </ul>
         </div>
         <div className={`nav-actions ${isOpen ? 'open' : ''}`}>
-            {user ? ( // Vérifier si l'utilisateur est connecté
+            {user ? ( 
                 <>
-                    <span>{user.email}</span> {/* Affiche l'email de l'utilisateur */}
-                    <FaUser className="user-icon cart-icon" /> {/* Icône utilisateur */}
-                    <FaSignOutAlt className="logout-icon cart-icon" onClick={handleLogout} /> {/* Icône de déconnexion */}
+                    <span>{user.email}</span> 
+                    <FaUser className="user-icon cart-icon" /> 
+                    <FaSignOutAlt className="logout-icon cart-icon" onClick={handleLogout} /> 
                 </>
             ) : (
-                <a href="/login">Mon compte</a> // Afficher "Mon compte" si non connecté
+                <a href="/login">Mon compte</a> 
             )}
-            <FaShoppingCart className="panier-icon cart-icon" />
+            <Link to="/panier"><FaShoppingCart className="panier-icon cart-icon" /></Link>
         </div>
         <div className="burger-menu" onClick={toggleMenu}>
           <span></span>
@@ -48,6 +55,7 @@ const Navbar = () => {
           <span></span>
         </div>
       </nav>
+      </>
     );
   }
   

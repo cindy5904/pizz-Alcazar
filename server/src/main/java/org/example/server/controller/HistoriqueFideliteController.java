@@ -25,7 +25,7 @@ public class HistoriqueFideliteController {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdHistorique);
     }
 
-    // Endpoint pour obtenir l'historique de fidélité par ID d'utilisateur
+
     @GetMapping("/user/{userId}")
     public ResponseEntity<List<HistoriqueFideliteDtoGet>> getHistoriqueByUserId(@PathVariable Long userId) {
         List<HistoriqueFidelite> historiques = historiqueFideliteService.findByUserId(userId);
@@ -35,14 +35,13 @@ public class HistoriqueFideliteController {
         return ResponseEntity.ok(historiqueDtos);
     }
 
-    // Endpoint pour obtenir l'historique de fidélité par mois et année
+
     @GetMapping("/mois/{annee}/{mois}")
     public ResponseEntity<List<HistoriqueFideliteDtoGet>> getHistoriqueParMois(@PathVariable int annee, @PathVariable int mois) {
         List<HistoriqueFideliteDtoGet> historiques = historiqueFideliteService.getHistoriqueParMois(annee, mois);
         return ResponseEntity.ok(historiques);
     }
 
-    // Endpoint pour compter le nombre de récompenses par mois et année
     @GetMapping("/compte-recompenses/{annee}/{mois}")
     public ResponseEntity<Long> countRecompensesParMois(@PathVariable int annee, @PathVariable int mois) {
         long count = historiqueFideliteService.countRecompensesParMois(annee, mois);

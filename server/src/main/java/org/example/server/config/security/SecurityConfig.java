@@ -57,10 +57,32 @@ public class SecurityConfig {
                         .requestMatchers("/api/auth/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/produits/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
-                        // Restreindre la création, modification, et suppression aux admins
+                        .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/produits/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/produits/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/produits/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/panier/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/panier/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/panier/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/panier/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/panier/user/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/panier/items/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/panier/items/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/panier/items/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/panier/items/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/commandes/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/commandes/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/commandes/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/commandes/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/paiements/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/paiements/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/paiements/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/paiements/**").hasAnyRole("CLIENT", "ADMIN")
+
+                        .anyRequest().authenticated()
 
                 )
                 .addFilterBefore(jwtRequestFilter(), UsernamePasswordAuthenticationFilter.class);
@@ -73,13 +95,13 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173"));  // Allow requests from frontend
-        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));  // Allow these methods
-        configuration.setAllowedHeaders(Arrays.asList("*"));  // Allow all headers
-        configuration.setAllowCredentials(true);  // Allow credentials (e.g., cookies)
+        configuration.setAllowedOrigins(Arrays.asList("http://localhost:5173", "http://localhost:3000", "http://localhost:5174"));  // Allow requests from frontend
+        configuration.setAllowedMethods(Arrays.asList("GET", "POST", "PUT", "DELETE", "OPTIONS"));
+        configuration.setAllowedHeaders(Arrays.asList("*"));
+        configuration.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-        source.registerCorsConfiguration("/**", configuration);  // Apply CORS configuration to all paths
+        source.registerCorsConfiguration("/**", configuration);
         return source;
     }
 }

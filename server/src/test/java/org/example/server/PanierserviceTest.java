@@ -94,7 +94,7 @@ public class PanierserviceTest {
         when(panierRepository.save(any(Panier.class))).thenReturn(panier);
         System.out.println("Avant l'appel à createPanier");
         // Act
-        PanierDtoGet result = panierService.createPanier(dtoPost);
+        PanierDtoGet result = panierService.addOrUpdatePanierItem(dtoPost);
 
         System.out.println("Après l'appel à createPanier");
         System.out.println("Valeur retournée : " + result);

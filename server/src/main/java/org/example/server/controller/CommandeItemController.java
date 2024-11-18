@@ -15,14 +15,14 @@ public class CommandeItemController {
     @Autowired
     private CommandeItemService commandeItemService;
 
-    // Endpoint pour créer un nouvel élément de commande
+
     @PostMapping
     public ResponseEntity<CommandeItemDtoGet> createCommandeItem(@RequestBody CommandeItemDtoPost itemDto) {
         CommandeItemDtoGet createdItem = commandeItemService.createCommandeItem(itemDto);
         return ResponseEntity.status(HttpStatus.CREATED).body(createdItem);
     }
 
-    // Endpoint pour mettre à jour un élément de commande
+
     @PutMapping("/{id}")
     public ResponseEntity<CommandeItemDtoGet> updateCommandeItem(
             @PathVariable Long id,
@@ -31,7 +31,7 @@ public class CommandeItemController {
         return ResponseEntity.ok(updatedItem);
     }
 
-    // Endpoint pour obtenir un élément de commande par ID
+
     @GetMapping("/{id}")
     public ResponseEntity<CommandeItemDtoGet> getCommandeItemById(@PathVariable Long id) {
         CommandeItemDtoGet item = commandeItemService.getCommandeItemById(id);

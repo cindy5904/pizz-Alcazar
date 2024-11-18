@@ -87,7 +87,7 @@ public class AuthServiceTest {
         when(authenticationManager.authenticate(any(UsernamePasswordAuthenticationToken.class))).thenReturn(authentication);
         when(jwtTokenProvider.generateToken(authentication)).thenReturn("jwtToken");
 
-        String token = authService.login(loginDto);
+        String token = String.valueOf(authService.login(loginDto));
 
         assertEquals("jwtToken", token);
     }

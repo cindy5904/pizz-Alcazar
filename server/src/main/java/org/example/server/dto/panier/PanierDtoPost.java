@@ -14,5 +14,6 @@ import java.util.List;
 @NoArgsConstructor
 public class PanierDtoPost {
     private Long userId;
+    private boolean actif;
     private List<PanierItemDtoPost> itemsPanier;
 }

@@ -21,12 +21,12 @@ public class PaiementController {
     @Autowired
     private PaiementService paiementService;
 
-    // Endpoint pour créer un paiement
+
     @PostMapping
     @Transactional
     public ResponseEntity<PaiementDtoGet> createPaiement(@RequestBody PaiementDtoPost dtoPost) {
         try {
-            // Créez un PaymentIntent sur Stripe
+
             PaymentIntentCreateParams params = PaymentIntentCreateParams.builder()
                     .setAmount((long) dtoPost.getMontant()) // Montant en cents
                     .setCurrency("eur") // Ou la devise souhaitée
@@ -37,7 +37,7 @@ public class PaiementController {
 
             PaymentIntent paymentIntent = PaymentIntent.create(params);
 
-            // Enregistrer le paiement dans la base de données
+
             PaiementDtoGet paiementDtoGet = paiementService.createPaiement(new PaiementDtoPost(
                     paymentIntent.getAmount(),
                     paymentIntent.getStatus(),
@@ -53,14 +53,14 @@ public class PaiementController {
         }
     }
 
-    // Endpoint pour récupérer un paiement par son ID
+
     @GetMapping("/{id}")
     public ResponseEntity<PaiementDtoGet> getPaiementById(@PathVariable Long id) {
         PaiementDtoGet paiementDtoGet = paiementService.getPaiementById(id);
         return ResponseEntity.ok(paiementDtoGet);
     }
 
-    // Endpoint pour récupérer tous les paiements d'une commande
+
     @GetMapping("/commande/{commandeId}")
     public ResponseEntity<List<PaiementDtoGet>> getPaiementsByCommandeId(@PathVariable Long commandeId) {
         List<PaiementDtoGet> paiements = paiementService.getPaiementsByCommandeId(commandeId);

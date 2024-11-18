@@ -4,6 +4,8 @@ import org.example.server.dto.commande.CommandeDtoGet;
 import org.example.server.dto.commande.CommandeDtoPost;
 import org.example.server.service.CommandeService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -29,8 +31,11 @@ public class CommandeController {
     }
 
     @GetMapping
-    public ResponseEntity<List<CommandeDtoGet>> getAllCommandes() {
-        List<CommandeDtoGet> commandes = commandeService.getAllCommandes();
+    public ResponseEntity<List<CommandeDtoGet>> getAllCommandes(
+            @RequestParam(defaultValue = "0") int page,
+            @RequestParam(defaultValue = "10") int size) {
+        Pageable pageable = PageRequest.of(page, size);
+        List<CommandeDtoGet> commandes = commandeService.getAllCommandes(pageable);
         return ResponseEntity.ok(commandes);
     }
 

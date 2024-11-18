@@ -9,7 +9,7 @@ import java.util.Optional;
 
 @Repository
 public interface PaiementRepository extends CrudRepository<Paiement, Long> {
-    // Recherche tous les paiements associés à une commande
+
     List<Paiement> findByCommandeId(Long commandeId);
 
     // Recherche un paiement par ID

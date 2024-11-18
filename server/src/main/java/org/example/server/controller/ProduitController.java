@@ -18,28 +18,58 @@ public class ProduitController {
     @Autowired
     private ProduitService produitService;
 
-    // Endpoint pour créer un nouveau produit
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping
     public ResponseEntity<ProduitDtoGet> creerProduit(
-            @RequestParam("produit") ProduitDtoPost dtoPost, // Assurez-vous que votre front-end envoie correctement ce paramètre
-            @RequestParam("image") MultipartFile imageFile) { // Ajoutez ici le paramètre pour le fichier image
-        ProduitDtoGet produitCree = produitService.creerProduit(dtoPost, imageFile); // Appel de la méthode avec les deux arguments
+            @RequestParam("nom") String nom,
+            @RequestParam("description") String description,
+            @RequestParam("prix") double prix,
+            @RequestParam("disponibilite") boolean disponibilite,
+            @RequestParam(value = "categorieId", required = false) Long categorieId,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile) {
+
+
+        ProduitDtoPost dtoPost = new ProduitDtoPost();
+        dtoPost.setNom(nom);
+        dtoPost.setDescription(description);
+        dtoPost.setPrix(prix);
+        dtoPost.setDisponibilite(disponibilite);
+        dtoPost.setCategorieId(categorieId);
+        System.out.println("Image reçue : " + (imageFile != null ? imageFile.getOriginalFilename() : "Aucune image")); // Ajoutez ce log
+
+        ProduitDtoGet produitCree = produitService.creerProduit(dtoPost, imageFile);
         return ResponseEntity.status(HttpStatus.CREATED).body(produitCree);
     }
 
-    // Endpoint pour mettre à jour un produit existant
+
+
+
     @PreAuthorize("hasRole('ADMIN')")
     @PutMapping("/{produitId}")
     public ResponseEntity<ProduitDtoGet> mettreAJourProduit(
             @PathVariable Long produitId,
-            @RequestParam("produit") ProduitDtoPost dtoPost, // Utilisez également @RequestParam pour la mise à jour si nécessaire
-            @RequestParam(value = "image", required = false) MultipartFile imageFile) { // Le paramètre image est optionnel pour la mise à jour
+            @RequestParam("nom") String nom,
+            @RequestParam("description") String description,
+            @RequestParam("prix") double prix,
+            @RequestParam("disponibilite") boolean disponibilite,
+            @RequestParam(value = "categorieId", required = false) Long categorieId,
+            @RequestParam(value = "image", required = false) MultipartFile imageFile) {
+
+        // Créez le dtoPost à partir des paramètres du formulaire
+        ProduitDtoPost dtoPost = new ProduitDtoPost();
+        dtoPost.setNom(nom);
+        dtoPost.setDescription(description);
+        dtoPost.setPrix(prix);
+        dtoPost.setDisponibilite(disponibilite);
+        dtoPost.setCategorieId(categorieId);
+
+
         ProduitDtoGet produitMisAJour = produitService.mettreAJourProduit(produitId, dtoPost, imageFile);
         return ResponseEntity.ok(produitMisAJour);
     }
 
-    // Endpoint pour récupérer un produit par son ID
+
+
     @GetMapping("/{produitId}")
     public ResponseEntity<ProduitDtoGet> getProduitById(@PathVariable Long produitId) {
         ProduitDtoGet produit = produitService.getProduitById(produitId);

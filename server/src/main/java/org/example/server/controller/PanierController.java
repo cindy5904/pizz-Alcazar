@@ -2,11 +2,14 @@ package org.example.server.controller;
 
 import org.example.server.dto.panier.PanierDtoGet;
 import org.example.server.dto.panier.PanierDtoPost;
+import org.example.server.dto.panierItem.PanierItemDtoPost;
 import org.example.server.entity.Produit;
 import org.example.server.service.PanierService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -16,23 +19,23 @@ import java.util.List;
 public class PanierController {
     @Autowired
     private PanierService panierService;
-
-    // Endpoint pour créer un nouveau panier
     @PostMapping
-    public ResponseEntity<PanierDtoGet> createPanier(@RequestBody PanierDtoPost dtoPost) {
-        PanierDtoGet createdPanier = panierService.createPanier(dtoPost);
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdPanier);
+    @PreAuthorize("hasRole('CLIENT') or hasRole('ADMIN')")
+    public ResponseEntity<PanierDtoGet> addItemToPanier(@RequestParam Long userId, @RequestBody PanierItemDtoPost itemDto) {
+        PanierDtoGet updatedPanier = panierService.addOrUpdatePanierItem(userId, itemDto);
+        return ResponseEntity.ok(updatedPanier);
     }
 
-    // Endpoint pour obtenir le panier par ID d'utilisateur
     @GetMapping("/user/{userId}")
-    public ResponseEntity<PanierDtoGet> getPanierByUserId(@PathVariable Long userId) {
-        PanierDtoGet panier = panierService.getPanierByUserId(userId);
+    @PreAuthorize("hasRole('CLIENT') or hasRole('ADMIN')")
+    public ResponseEntity<PanierDtoGet> getPanierActifByUserId(@PathVariable Long userId, Authentication authentication) {
+        System.out.println("Rôles de l'utilisateur : " + authentication.getAuthorities());
+        PanierDtoGet panier = panierService.getPanierActifByUserId(userId);
         return ResponseEntity.ok(panier);
     }
 
-    // Endpoint pour obtenir les produits d'un panier par ID de panier
     @GetMapping("/{panierId}/produits")
+    @PreAuthorize("hasRole('CLIENT') or hasRole('ADMIN')")
     public ResponseEntity<List<Produit>> getProduitsByPanierId(@PathVariable Long panierId) {
         List<Produit> produits = panierService.getProduitsByPanierId(panierId);
         return ResponseEntity.ok(produits);

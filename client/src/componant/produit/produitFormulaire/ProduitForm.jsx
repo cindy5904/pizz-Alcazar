@@ -11,7 +11,9 @@ const ProduitForm = () => {
     const { id } = useParams();
     const dispatch = useDispatch();
     const navigate = useNavigate();
-    const [image, setImage] = useState(null);
+    const [imageFile, setImageFile] = useState(null);
+    const [imagePreview, setImagePreview] = useState(null);
+    const [erreur, setErreur] = useState(null);
 
     const [produit, setProduit] = useState({
         nom: '',
@@ -40,15 +42,19 @@ const ProduitForm = () => {
 
     useEffect(() => {
         if (produitActuel) {
+            console.log("Produit actuel:", produitActuel);
+            console.log("Catégorie actuelle:", produitActuel.categorie);
             setProduit({
                 nom: produitActuel.nom,
                 description: produitActuel.description,
                 prix: produitActuel.prix,
                 disponibilite: produitActuel.disponibilite,
-                categorieId: produitActuel.categorie.id, // Assurez-vous de récupérer l'ID de la catégorie
+                categorieId: produitActuel.categorie ? produitActuel.categorie.id : '',
             });
+            setImageFile(null);
         }
     }, [produitActuel]);
+    
 
     const handleChange = (e) => {
         const { name, value, type, checked, files } = e.target;
@@ -56,39 +62,52 @@ const ProduitForm = () => {
             ...produit, 
             [name]: type === 'checkbox' ? checked : value 
         });
-    
-        // Si c'est le champ de fichier, mettez à jour l'état de l'image
+
         if (name === 'image') {
-            setImage(files[0]); // Récupérer le premier fichier sélectionné
+            console.log("Fichier d'image sélectionné :", files[0]);
+            setImageFile(files[0]);
+            const file = files[0];
+            const reader = new FileReader();
+            reader.onloadend = () => {
+                setImagePreview(reader.result);
+            };
+            if (file) {
+                reader.readAsDataURL(file);
+            } else {
+                setImagePreview(null);
+            }
         }
+        
     };
 
-    const handleSubmit = (e) => {
+    const handleSubmit = async (e) => {
         e.preventDefault();
-        const formData = new FormData(); // Créer une instance de FormData
+        setErreur(null);
     
-        // Ajouter le produit sous la clé "produit"
-        formData.append('produit', JSON.stringify({
-            nom: produit.nom,
-            description: produit.description,
-            prix: produit.prix,
-            disponibilite: produit.disponibilite,
-            categorieId: produit.categorieId,
-        }));
-    
-        // Ajouter l'image si elle existe sous la clé "image"
-        if (image) {
-            formData.append('image', image);
+        try {
+            if (id) {
+                const result = await dispatch(mettreAJourProduit({ id, produitData: produit, imageFile }));
+                if (result.meta.requestStatus === 'fulfilled') {
+                    navigate("/produits");
+                } else {
+                    setErreur("Erreur lors de la mise à jour du produit.");
+                }
+            } else {
+                const result = await dispatch(creerProduit({ produitData: produit, imageFile }));
+                if (result.meta.requestStatus === 'fulfilled') {
+                    navigate("/produits");
+                } else {
+                    setErreur("Erreur lors de la création du produit.");
+                }
+            }
+        } catch (error) {
+            console.error("Erreur lors de la soumission :", error);
+            setErreur("Une erreur est survenue lors de la soumission.");
         }
-    
-        // Vérifier si c'est une mise à jour ou une création
-        if (id) {
-            dispatch(mettreAJourProduit({ id, formData })); // Envoyer le FormData lors de la mise à jour
-        } else {
-            dispatch(creerProduit(formData)); // Envoyer le FormData lors de la création
-        }
-        navigate('/produits');
     };
+    const imageUrl = produitActuel && produitActuel.imagePath
+    ? `http://localhost:8080${produitActuel.imagePath}`
+    : null;
     
 
     return (
@@ -159,15 +178,21 @@ const ProduitForm = () => {
                         </select>
                     </div>
                     <div className="form-group">
-    <label>Image:</label>
-    <input
-        type="file"
-        name="image"
-        accept="image/*" // Accepte uniquement les fichiers image
-        onChange={handleChange}
-        required
-    />
-</div>
+                        <label>Image actuelle:</label>
+                        {imageUrl && (
+                            <img src={imageUrl} alt="Image du produit" style={{ width: '100px', height: '100px' }} />
+                        )}
+                    </div>
+
+                    <div className="form-group">
+                        <label>Nouvelle Image:</label>
+                        <input
+                            type="file"
+                            name="image"
+                            accept="image/*"
+                            onChange={handleChange}
+                        />
+                    </div>
                     <button type="submit">{id ? 'Modifier' : 'Ajouter'}</button>
                 </form>
             </div>

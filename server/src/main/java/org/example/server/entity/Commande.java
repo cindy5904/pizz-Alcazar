@@ -35,6 +35,4 @@ public class Commande {
     private Panier panier;
     @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CommandeItem> itemsCommande;
-
-
 }

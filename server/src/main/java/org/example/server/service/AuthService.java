@@ -1,13 +1,15 @@
 package org.example.server.service;
 
 import org.example.server.dto.user.LoginDto;
+import org.example.server.dto.user.LoginResponse;
 import org.example.server.dto.user.RegisterDto;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface AuthService {
     String register(RegisterDto registerDto);
+    LoginResponse login(LoginDto loginDto);
 
-    String login(LoginDto loginDto);
+
 
     Long getIdByEmail(String email);
 

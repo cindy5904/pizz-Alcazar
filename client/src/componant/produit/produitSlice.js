@@ -6,11 +6,13 @@ import produitService from '../../service/produitService';
 // Action pour créer un produit
 export const creerProduit = createAsyncThunk(
     'produits/creer',
-    async ({ produitData, imageFile }, thunkAPI) => { // Modifier pour accepter un objet
+    async ({ produitData, imageFile }, thunkAPI) => {
         try {
-            return await produitService.creerProduit(produitData, imageFile); // Passer les deux arguments
+            // Appel au service avec les paramètres requis
+            return await produitService.creerProduit(produitData, imageFile);
         } catch (error) {
-            return thunkAPI.rejectWithValue(error.response.data);
+            console.error("Erreur lors de la création du produit:", error);
+            return thunkAPI.rejectWithValue(error.response?.data || "Erreur inconnue");
         }
     }
 );
@@ -18,9 +20,10 @@ export const creerProduit = createAsyncThunk(
 // Action pour mettre à jour un produit
 export const mettreAJourProduit = createAsyncThunk(
     'produits/mettreAJour',
-    async ({ id, produitData, imageFile }, thunkAPI) => { // Modifier pour accepter un objet
+    async ({ id, produitData, imageFile }, thunkAPI) => {
         try {
-            return await produitService.mettreAJourProduit(id, produitData, imageFile); // Passer les deux arguments
+            const response = await produitService.mettreAJourProduit(id, produitData, imageFile);
+            return response; // Doit retourner le produit mis à jour
         } catch (error) {
             return thunkAPI.rejectWithValue(error.response.data);
         }

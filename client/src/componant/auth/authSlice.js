@@ -3,60 +3,85 @@ import { login, register, logout as logoutService } from '../../service/authServ
 import axios from 'axios';
 import * as jwtDecode from 'jwt-decode';
 
-// Configurer axios pour envoyer le token d'authentification avec chaque requête
+
+
+
 axios.interceptors.request.use((config) => {
-    const token = localStorage.getItem('token'); // Récupérer le token du localStorage
+    const token = localStorage.getItem('token'); 
     if (token) {
-      config.headers['Authorization'] = `Bearer ${token}`; // Ajouter le token dans l'en-tête
+      config.headers['Authorization'] = `Bearer ${token}`; 
     }
     return config;
 }, (error) => {
-    return Promise.reject(error); // Gérer les erreurs de la requête
+    return Promise.reject(error); 
 });
 
-// Thunk pour l'enregistrement
+
 export const registerUser = createAsyncThunk('auth/register', async (userData) => {
     const response = await register(userData);
-    return response; // Renvoie les données de l'utilisateur
+    return response; 
 });
 
-// Thunk pour la connexion
+
 export const loginUser = createAsyncThunk('auth/login', async (userData) => {
     const response = await login(userData);
-    console.log('Login response:', response); // Vérifiez ce qui est renvoyé
-    return { token: response }; // Retournez le token
+    console.log('Login response export loginUser:', response); 
+    return { 
+        token: response.token, 
+        roles: response.roles, 
+        id: response.userId,
+    }; 
 });
 
-// Thunk pour la déconnexion
 export const logoutUser = createAsyncThunk('auth/logout', async () => {
-    await logoutService(); // Appelle le service de déconnexion
+    await logoutService();
     localStorage.removeItem('token'); 
 });
 
-// Nouvelle thunk pour vérifier l'utilisateur
-// export const checkUser = createAsyncThunk('auth/checkUser', async () => {
-//     const token = localStorage.getItem('token');
-//     if (token) {
-//         return { token }; // Vous pouvez aussi renvoyer d'autres infos si nécessaire
-//     }
-//     return null; // Pas de token
-// });
 export const checkUser = createAsyncThunk('auth/checkUser', async () => {
     const token = localStorage.getItem('token');
     if (token) {
-        const decodedToken = jwtDecode(token); // Remplacez jwtDecode par votre fonction de décodage
-        console.log(decodedToken);
-        return { email: decodedToken.sub }; // Assurez-vous de retourner l'email
+        try {
+            const user = JSON.parse(localStorage.getItem('user'));
+            if (user) {
+                return {
+                    token,
+                    id: user.id, 
+                    email: user.email,
+                    roles: user.roles
+                    
+                };
+            }
+
+            // Si l'utilisateur n'est pas trouvé dans le localStorage, faites une requête à l'API
+            const response = await axios.get('http://localhost:8080/api/auth/user/details', {
+                headers: {
+                    Authorization: `Bearer ${token}`
+                }
+            });
+            return {
+                token,
+                id: response.data.id,
+                email: response.data.email,
+                roles: response.data.roles
+            };
+        } catch (error) {
+            console.error("Erreur lors de la récupération des détails de l'utilisateur :", error);
+            localStorage.removeItem('token');
+            return null;
+        }
     }
     return null;
 });
+
+
 
 // Création du slice
 const authSlice = createSlice({
     name: 'auth',
     initialState: {
         user: null,  // Pour stocker les informations de l'utilisateur
-        token: null, // Pour stocker le token JWT
+        token: localStorage.getItem('token') || null,  // Pour stocker le token JWT
         loading: false,
         error: null,
     },
@@ -85,14 +110,29 @@ const authSlice = createSlice({
             .addCase(loginUser.pending, (state) => {
                 state.loading = true;
             })
+            // .addCase(loginUser.fulfilled, (state, action) => {
+            //     state.loading = false;
+            //     const { id, token, roles } = action.payload;
+            //     state.token = token;
+            //     state.user = { id, email, roles };
+            //     localStorage.setItem('token', token);
+            //     // state.user = { email: action.meta.arg.email, roles };
+            
+            //     // Stockez les détails de l'utilisateur dans le localStorage
+            //     localStorage.setItem('user', JSON.stringify({ email: action.meta.arg.email, roles }));
+            // })
             .addCase(loginUser.fulfilled, (state, action) => {
                 state.loading = false;
-                const { token } = action.payload;
+                const { token, roles, id } = action.payload; // Utilisez `id` ici pour être cohérent avec ce qui est retourné
                 state.token = token;
-                console.log(token);
-                localStorage.setItem('token', token); // Assurez-vous de stocker le token
-                state.user = { email: action.meta.arg.email }; // Enregistrez l'utilisateur
+                state.user = { id, email: action.meta.arg.email, roles };
+                
+                localStorage.setItem('token', token);
+                // Stockez les détails de l'utilisateur dans le localStorage
+                localStorage.setItem('user', JSON.stringify({ id, email: action.meta.arg.email, roles }));
+                console.log('Vérification de localStorage après connexion :', JSON.parse(localStorage.getItem('user')));
             })
+            
             .addCase(loginUser.rejected, (state, action) => {
                 state.loading = false;
                 state.error = action.error.message; // Gère l'erreur
@@ -103,15 +143,22 @@ const authSlice = createSlice({
             })
             // Nouveau cas pour vérifier l'utilisateur
             .addCase(checkUser.fulfilled, (state, action) => {
-                console.log("checkUser fulfilled action payload:", action.payload);
+                console.log("Payload reçu dans checkUser.fulfilled :", action.payload);
                 if (action.payload) {
-                    state.user = action.payload; // Mettre à jour user avec l'email
-                    console.log("User and token restored in state:", state.user, state.token);
+                    state.token = action.payload.token;
+                    state.user = {
+                        id: action.payload.id,
+                        email: action.payload.email,
+                        roles: action.payload.roles
+                    };
                 } else {
                     state.user = null;
                     state.token = null;
                 }
             });
+            
+            
+            
     },
 });
 

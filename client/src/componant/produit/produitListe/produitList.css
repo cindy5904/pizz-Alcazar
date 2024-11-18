@@ -1,0 +1,98 @@
+.produit-container {
+    max-width: 1200px;
+    margin: auto;
+    padding: 20px;
+    background-color: #f9f3e5; /* Arrière-plan doux */
+    border-radius: 10px;
+}
+
+.produit-titre {
+    text-align: center;
+    color: #b34700; /* Ton chaud pour rappeler le bois et le four */
+    font-size: 2.5rem;
+    margin-bottom: 30px;
+}
+
+.produit-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+    gap: 20px;
+}
+
+.produit-card {
+    background-color: #fff;
+    border-radius: 15px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: transform 0.2s ease-in-out;
+}
+
+.produit-card:hover {
+    transform: translateY(-5px);
+}
+
+.produit-image-container {
+    width: 100%;
+    border-radius: 15px 15px 0 0;
+    overflow: hidden;
+}
+
+.produit-image {
+    width: 100%;
+    height: 300px;
+    display: block;
+    object-fit: cover;
+}
+
+.produit-details {
+    padding: 15px;
+    text-align: center;
+}
+
+.produit-nom {
+    font-size: 1.5rem;
+    color: #d35400; /* Couleur chaude */
+    margin: 10px 0;
+}
+
+.produit-description {
+    font-size: 1rem;
+    color: #555;
+    margin-bottom: 15px;
+}
+
+.produit-prix {
+    font-size: 1.3rem;
+    font-weight: bold;
+    color: #27ae60; /* Accent de vert pour le prix */
+}
+
+.btn {
+    display: block;
+    width: 100%;
+    padding: 10px;
+    margin-top: 15px;
+    border: none;
+    border-radius: 5px;
+    font-size: 1rem;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.btn-add {
+    background-color: #e67e22;
+    color: #fff;
+}
+
+.btn-add:hover {
+    background-color: #cf711c;
+}
+
+.btn-edit {
+    background-color: #3498db;
+    color: #fff;
+}
+
+.btn-delete {
+    background-color: #e74c3c;
+    color: #fff;
+}

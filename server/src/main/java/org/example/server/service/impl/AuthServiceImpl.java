@@ -3,6 +3,7 @@ package org.example.server.service.impl;
 import jakarta.transaction.Transactional;
 import org.example.server.config.jwt.JwtTokenProvider;
 import org.example.server.dto.user.LoginDto;
+import org.example.server.dto.user.LoginResponse;
 import org.example.server.dto.user.RegisterDto;
 import org.example.server.entity.Role;
 import org.example.server.entity.Utilisateur;
@@ -27,6 +28,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 @Service
 public class AuthServiceImpl implements AuthService, UserDetailsService {
@@ -71,24 +73,46 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
 
     @Override
-    public String login(LoginDto loginDto) {
+    public LoginResponse login(LoginDto loginDto) {
         try {
             Authentication authentication = authenticationManager.authenticate(
                     new UsernamePasswordAuthenticationToken(loginDto.getEmail(), loginDto.getMotDePasse())
             );
 
             SecurityContextHolder.getContext().setAuthentication(authentication);
-            return jwtTokenProvider.generateToken(authentication);
+            String token = jwtTokenProvider.generateToken(authentication);
+
+            // Vérification du type de `principal`
+            Object principal = authentication.getPrincipal();
+            Utilisateur utilisateur;
+            if (principal instanceof Utilisateur) {
+                utilisateur = (Utilisateur) principal;
+                System.out.println("Utilisateur ID: " + utilisateur.getId()); // Affiche l'ID de l'utilisateur pour vérification
+            } else {
+                System.out.println("Le principal n'est pas de type Utilisateur");
+                throw new IllegalStateException("Type de principal inattendu : " + principal.getClass().getName());
+            }
+
+            // Récupération des rôles de l'utilisateur
+            Set<String> roles = utilisateur.getUserRoles().stream()
+                    .map(Role::getName)
+                    .collect(Collectors.toSet());
+
+//            return new LoginResponse(token, roles, utilisateur.getId());
+            LoginResponse loginResponse = new LoginResponse(token, roles, utilisateur.getId());
+            System.out.println("Contenu de LoginResponse avant retour : " + loginResponse); // Log pour vérifier le contenu
+            return loginResponse;
         } catch (InternalAuthenticationServiceException e) {
-            // Log the error
+            // Log l'erreur
             System.out.println("InternalAuthenticationServiceException: " + e.getMessage());
-            throw e;  // Rethrow to let Spring handle it
+            throw e;
         } catch (AuthenticationException e) {
-            // Log the error
+            // Log l'erreur
             System.out.println("AuthenticationException: " + e.getMessage());
-            throw e;  // Rethrow to let Spring handle it
+            throw e;
         }
     }
+
 
 
     @Override

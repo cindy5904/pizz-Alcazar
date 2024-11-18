@@ -6,6 +6,7 @@ import org.example.server.service.PanierItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 @RestController
@@ -14,8 +15,9 @@ public class PanierItemController {
     @Autowired
     private PanierItemService panierItemService;
 
-    // Endpoint pour ajouter ou mettre à jour un item dans le panier
+
     @PostMapping("/{panierId}")
+    @PreAuthorize("hasRole('CLIENT') or hasRole('ADMIN')")
     public ResponseEntity<PanierItemDtoGet> ajouterOuMettreAJourItem(
             @PathVariable Long panierId,
             @RequestBody PanierItemDtoPost itemDto) {
@@ -23,8 +25,8 @@ public class PanierItemController {
         return ResponseEntity.status(HttpStatus.CREATED).body(updatedItem);
     }
 
-    // Endpoint pour réduire la quantité d'un item dans le panier
-    @PutMapping("/{panierId}/reduire/{produitId}")
+    @PutMapping("/{panierId}/{produitId}")
+    @PreAuthorize("hasRole('CLIENT') or hasRole('ADMIN')")
     public ResponseEntity<PanierItemDtoGet> reduireQuantiteItem(
             @PathVariable Long panierId,
             @PathVariable Long produitId,
@@ -34,6 +36,7 @@ public class PanierItemController {
     }
 
     @DeleteMapping("/{panierId}/{produitId}")
+    @PreAuthorize("hasRole('CLIENT') or hasRole('ADMIN')")
     public ResponseEntity<Void> supprimerItem(
             @PathVariable Long panierId,
             @PathVariable Long produitId) {

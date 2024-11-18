@@ -10,10 +10,10 @@ import java.util.Optional;
 
 @Repository
 public interface HistoriqueFideliteRepository extends CrudRepository<HistoriqueFidelite, Long> {
-    // Recherche tous les historiques de fidélité par utilisateur
+
     List<HistoriqueFidelite> findByUserId(Long userId);
 
-    // Recherche un historique de fidélité par ID
+
     Optional<HistoriqueFidelite> findById(Long id);
 
 

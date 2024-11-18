@@ -10,11 +10,10 @@ import java.util.List;
 public interface PanierItemRepository extends CrudRepository<PanierItem, Long> {
     List<PanierItem> findByPanierId(Long panierId);
 
-    // Récupère un item de panier par son produit et son panier
+
     PanierItem findByProduitIdAndPanierId(Long produitId, Long panierId);
     void deleteById(Long id);
 
-    // Supprime un item de panier par produit et panier
     void deleteByProduitIdAndPanierId(Long produitId, Long panierId);
 
 }

@@ -35,7 +35,7 @@ public class JwtTokenProvider {
         // Extraire les rôles (autorités) de l'objet Authentication
         String roles = auth.getAuthorities().stream()
                 .map(grantedAuthority -> grantedAuthority.getAuthority())
-                .collect(Collectors.joining(",")); // Joindre les rôles par une virgule si l'utilisateur a plusieurs rôles
+                .collect(Collectors.joining(","));
 
         Long id = ((Utilisateur) auth.getPrincipal()).getId();
 
@@ -46,7 +46,7 @@ public class JwtTokenProvider {
 
         String token = Jwts.builder()
                 .setSubject(username)
-                .claim("roles", roles) // Ajouter les rôles comme revendication personnalisée
+                .claim("roles", roles)
                 .claim("userid",id)
                 .setIssuedAt(new Date())
                 .setExpiration(expireDate)

@@ -12,8 +12,10 @@ export const register = async (userData) => {
 // Fonction pour la connexion
 export const login = async (userData) => {
   const response = await axios.post(`${API_URL}/login`, userData);
-  return response.data; // Renvoie le token d'authentification
+  console.log('Backend response dans le frontend:', response.data); // Ajoutez ce log
+  return response.data; // Renvoie l'objet complet
 };
+
 
 // Fonction pour la déconnexion (si vous avez besoin de l'implémenter)
 export const logout = async () => {

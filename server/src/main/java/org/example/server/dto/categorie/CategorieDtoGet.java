@@ -8,6 +8,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class CategorieDtoGet {
-    private Long id; // Champ pour l'ID
+    private Long id;
     private String nom;
 }

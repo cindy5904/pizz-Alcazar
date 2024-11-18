@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.example.server.entity.Role;
 
+import java.util.Set;
+
 @Data
 @Builder
 @AllArgsConstructor
@@ -18,7 +20,7 @@ public class UtilisateurDtoGet {
     private String adresse;
     private String telephone;
     private int pointsFidelite;
-    private Role roles;
+    private Set<String> roles;;
 
     public UtilisateurDtoGet(Long id, String nom, String prenom) {
     }
