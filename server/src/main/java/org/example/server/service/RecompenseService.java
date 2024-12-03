@@ -23,11 +23,7 @@ public class RecompenseService {
     @Autowired
     private UtilisateurRepository utilisateurRepository;
 
-    /**
-     * Créer une nouvelle récompense manuellement (pour un administrateur par exemple).
-     * @param dto le DTO contenant les détails de la récompense.
-     * @return la récompense créée.
-     */
+
     public RecompenseDtoGet createRecompense(RecompenseDtoPost dto) {
         Recompense recompense = new Recompense();
         recompense.setNom(dto.getNom());
@@ -44,7 +40,7 @@ public class RecompenseService {
         Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId)
                 .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé"));
 
-        // Créer la récompense automatiquement
+
         Recompense recompense = new Recompense();
         recompense.setNom("Remise de 10%");
         recompense.setDescription("Remise automatique pour avoir atteint 100 points de fidélité.");

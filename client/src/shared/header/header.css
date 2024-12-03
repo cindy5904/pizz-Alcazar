@@ -1,88 +1,89 @@
-/* Header.css */
-header {
-    background-color: #f5f5f5;  
-    padding: 10px 35px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    
-  }
-.logo {
-    padding-top: 10px;
+.hero {
+  position: relative;
+  height: 100vh;
+  background: url('../../assets/images/imageFond.webp') center/cover no-repeat;
+  display: flex;
+  align-items: center; /* Centre verticalement */
+  color: white;
 }
-  .logo img {
-    height: 60px; 
-    width: auto;
-  }
-  
-  .header-info {
-    text-align: center;
-  }
-  
-  .header-info p {
-    margin: 0;
-    font-size: 14px;
-    font-weight: bold;
-  }
-  
-  .header-info p:first-child {
-    margin-bottom: 5px; /* Ajoute de l'espace entre le numéro et les heures d'ouverture */
-  }
-  
-  .header-actions button {
-    background-color: #4e6026; /* Utilisation de la couleur de ton logo */
-    color: #fff; /* Texte en blanc pour un bon contraste */
-    border: none;
-    padding: 10px 20px;
-    font-size: 13px;
-    font-weight: bold;
-    border-radius: 5px; /* Bords arrondis pour un style moderne */
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease; /* Animation pour hover */
-  }
-  
-  .header-actions button:hover {
-    background-color: #6b7f3d; /* Une teinte plus claire pour l'effet hover */
-    transform: translateY(-2px); /* Légère élévation pour l'effet au survol */
-  }
-  
-  .header-actions button:active {
-    background-color: #3d4b1a; /* Couleur plus foncée lors du clic */
-    transform: translateY(0); /* Remet le bouton à sa place lors du clic */
-  }
-  
-  .header-actions button:focus {
-    outline: none; /* Retire le contour par défaut lors du focus */
-    box-shadow: 0 0 0 2px rgba(78, 96, 38, 0.5); /* Ajoute une ombre subtile lors du focus */
-  }
 
-  @media (max-width: 480px) {
-    header {
-      flex-direction: column; /* Empile les éléments */
-      align-items: flex-start; /* Aligne les éléments à gauche */
-      padding: 10px;
-    }
+.hero .overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+  text-align: left; /* Aligne le texte à gauche */
+  max-width: 500px; /* Limite la largeur pour éviter qu’elle occupe tout l’écran */
+  padding-left: 90px; /* Espace à gauche pour respirer */
+}
+
+.hero-content .h1Header {
+  display: inline-block;
+  background-color: #446c22;
+  color: white;
+  font-size: 1.2rem;
+  font-weight: bold;
+  text-transform: uppercase;
+  padding: 0.5rem 1rem;
+  border-radius: 5px;
+  margin-bottom: 1rem;
+}
+
+.hero-content .h2Header {
+  font-size: 2.5rem; 
+  font-weight: bold;
+  margin-bottom: 0.5rem;
+  line-height: 1.2; 
+  text-transform: uppercase;
+  color: white;
+  max-width: 90%; 
+  white-space: nowrap; 
   
-    .logo img {
-      height: 40px; /* Réduit la taille du logo */
-    }
   
-    .header-info {
-      flex-direction: column; /* Passe les infos en colonne */
-      align-items: flex-start; /* Aligne à gauche */
-      gap: 5px;
-      margin: 10px 0;
-    }
-  
-    .header-info p {
-      font-size: 14px; /* Réduit la taille de la police pour mobile */
-    }
-  
-    .header-actions button {
-      padding: 8px 16px;
-      font-size: 14px; /* Réduit la taille du bouton */
-      width: 100%; /* Occupe toute la largeur disponible */
-      text-align: center;
-    }
+}
+
+
+.cta-button {
+  display: inline-block;
+  padding: 1rem 2rem;
+  background: #f44336;
+  color: white;
+  text-transform: uppercase;
+  font-weight: bold;
+  border-radius: 5px;
+  font-size: 1rem;
+  transition: background 0.3s ease;
+  margin-top: 1rem; /* Ajoute de l’espace entre les h2 et le bouton */
+  text-align: center; /* Centre le texte dans le bouton */
+  animation: heartbeat 1.5s infinite;
+}
+
+.cta-button:hover {
+  background: #d32f2f;
+}
+
+@keyframes heartbeat {
+  0% {
+    transform: scale(1);
   }
-  
+  30% {
+    transform: scale(1.1); /* Augmente légèrement la taille */
+  }
+  50% {
+    transform: scale(1); /* Revient à la taille normale */
+  }
+  70% {
+    transform: scale(1.1); /* Deuxième battement */
+  }
+  100% {
+    transform: scale(1); /* Revient à la taille normale */
+  }
+}

@@ -44,6 +44,9 @@ public class Utilisateur implements UserDetails {
     )
     private Set<Role> userRoles = new HashSet<>();
 
+    public Utilisateur(Long userId) {
+    }
+
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
         return  userRoles.stream()

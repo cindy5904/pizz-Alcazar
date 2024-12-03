@@ -5,6 +5,7 @@ import org.example.server.entity.Utilisateur;
 import org.springframework.data.repository.CrudRepository;
 import org.springframework.stereotype.Repository;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
@@ -13,4 +14,8 @@ public interface RecompenseRepository extends CrudRepository<Recompense, Long> {
     Optional<Recompense> findByNom(String nom);
     Optional<Recompense> findById(Long id);
     List<Recompense> findByUser(Utilisateur user);
+
+    List<Recompense> findByUserAndDateRemiseAfter(Utilisateur user, LocalDate date);
+
+
 }

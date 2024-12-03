@@ -1,19 +1,16 @@
 import React from 'react';
-import logo from '../../assets/images/logoPizzAlcazar.png';
 import '../header/header.css';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   return (
-    <header>
-      <div className="logo">
-        <img src={logo} alt="Logo Pizzeria" />
-      </div>
-      <div className="header-info">
-        <p>📞 01 71 40 68 00</p>
-        <p>🕒 Ouvert : 11h - 23h</p>
-      </div>
-      <div className="header-actions">
-        <button>Commander en ligne</button>
+    <header className="hero">
+     <div className="overlay"></div> 
+      <div className="hero-content">
+        <h1 className='h1Header'>Pizz'Alcazar</h1>
+        <h2 className='h2Header'>La meilleure pizza italienne</h2>
+        <h2 className='h2Header'>Près de chez vous</h2>
+        <Link to="/categories" className="cta-button">Commander</Link>
       </div>
     </header>
   );

@@ -1,5 +1,9 @@
 package org.example.server.config.security;
 
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import org.example.server.config.jwt.JwtAuthenticationEntryPoint;
 import org.example.server.config.jwt.JwtRequestFilter;
 import org.springframework.context.annotation.Bean;
@@ -18,7 +22,9 @@ import org.springframework.security.web.authentication.UsernamePasswordAuthentic
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import java.io.IOException;
 import java.util.Arrays;
 
 @Configuration
@@ -55,6 +61,7 @@ public class SecurityConfig {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers("/api/auth/**").permitAll()
+                        .requestMatchers(HttpMethod.PUT, "/api/auth/update").authenticated()
                         .requestMatchers(HttpMethod.GET, "/api/produits/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/categories/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/images/**").permitAll()
@@ -76,7 +83,7 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.POST, "/api/commandes/**").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/commandes/**").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/commandes/**").hasAnyRole("CLIENT", "ADMIN")
-                        .requestMatchers(HttpMethod.GET, "/api/commandes/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.GET,  "/api/commandes/**").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/paiements/**").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/paiements/**").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/paiements/**").hasAnyRole("CLIENT", "ADMIN")
@@ -85,7 +92,16 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
 
                 )
-                .addFilterBefore(jwtRequestFilter(), UsernamePasswordAuthenticationFilter.class);
+
+                .addFilterBefore(jwtRequestFilter(), UsernamePasswordAuthenticationFilter.class)
+                .addFilterAfter(new OncePerRequestFilter() {
+            @Override
+            protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException, ServletException, IOException {
+                System.out.println("Requête reçue : " + request.getMethod() + " " + request.getRequestURI());
+                System.out.println("Authorization header : " + request.getHeader("Authorization"));
+                filterChain.doFilter(request, response);
+            }
+        }, UsernamePasswordAuthenticationFilter.class);
 
 
         return http.build();

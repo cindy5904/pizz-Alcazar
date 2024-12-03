@@ -12,7 +12,7 @@ axios.interceptors.request.use((config) => {
 }, (erreur) => Promise.reject(erreur));
 
 const CommandeService = {
-    // 1. Créer une commande
+    
     creerCommande: async (donneesCommande) => {
         const reponse = await axios.post(URL_API, donneesCommande);
         return reponse.data;
@@ -24,11 +24,21 @@ const CommandeService = {
         return reponse.data;
     },
 
-    // 3. Récupérer toutes les commandes (avec pagination)
-    obtenirToutesCommandes: async (page = 0, taille = 10) => {
-        const reponse = await axios.get(`${URL_API}?page=${page}&size=${taille}`);
-        return reponse.data;
-    },
+    // 3. Récupérer toutes les commandes (avec pagination et filtrage par utilisateur)
+obtenirToutesCommandes: async (userId, page = 0, taille = 10) => {
+    console.log("obtenirToutesCommandes est appelée avec userId :", userId, "page :", page, "taille :", taille);
+    if (!userId) {
+        throw new Error("userId est requis pour récupérer les commandes.");
+    }
+    console.log("URL de la requête :", `${URL_API}?userId=${userId}&page=${page}&size=${taille}`);
+console.log("Headers :", {
+    Authorization: `Bearer ${localStorage.getItem('token')}`
+});
+
+    const reponse = await axios.get(`${URL_API}?userId=${userId}&page=${page}&size=${taille}`);
+    return reponse.data;
+},
+
 
     // 4. Mettre à jour une commande
     mettreAJourCommande: async (id, donneesMiseAJour) => {

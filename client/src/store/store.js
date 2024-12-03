@@ -14,7 +14,7 @@ const store = configureStore({
     categorie : categorieReducer,
     panier: panierReducer,
     panierItem: panierItemReducer,
-    commande : commandeSliceReducer,
+    commandes : commandeSliceReducer,
     paiement : paiementReducer,
   },
 });

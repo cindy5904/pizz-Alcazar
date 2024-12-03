@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import PaiementService from '../../service/paiementService';
 
-// Thunks asynchrones
-
-// 1. Créer un paiement
 export const creerPaiement = createAsyncThunk(
     'paiements/creerPaiement',
     async (donneesPaiement, { rejectWithValue }) => {
@@ -42,14 +39,14 @@ export const obtenirPaiementsParCommandeId = createAsyncThunk(
     }
 );
 
-// Définition du slice
 const paiementSlice = createSlice({
     name: 'paiements',
     initialState: {
-        paiements: [],
+        paiements: [], 
         paiementActuel: null,
-        chargement: false,
-        erreur: null,
+        chargement: false, 
+        erreur: null, 
+        statutPaiement: null, 
     },
     reducers: {},
     extraReducers: (builder) => {
@@ -57,14 +54,17 @@ const paiementSlice = createSlice({
             .addCase(creerPaiement.pending, (state) => {
                 state.chargement = true;
                 state.erreur = null;
+                state.statutPaiement = null; 
             })
             .addCase(creerPaiement.fulfilled, (state, action) => {
                 state.chargement = false;
                 state.paiementActuel = action.payload;
+                state.statutPaiement = action.payload.statut; 
             })
             .addCase(creerPaiement.rejected, (state, action) => {
                 state.chargement = false;
                 state.erreur = action.payload;
+                state.statutPaiement = 'ECHOUE'; 
             })
             .addCase(obtenirPaiementParId.fulfilled, (state, action) => {
                 state.chargement = false;

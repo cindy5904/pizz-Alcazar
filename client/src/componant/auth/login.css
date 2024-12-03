@@ -1,77 +1,135 @@
-/* Login.css */
 
-.login-container {
-    max-width: 400px; /* Largeur adaptée pour le formulaire de connexion */
-    margin: 60px auto; /* Centré avec un espace supérieur pour le header */
-    padding: 25px; /* Espace intérieur */
-    background-color: #fefefe; /* Fond clair */
-    border-radius: 8px; /* Coins légèrement arrondis */
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1); /* Ombre douce */
-}
-
-h2 {
-    text-align: center; /* Centre le titre */
-    color: #c0392b; /* Rouge italien */
-    font-family: 'Arial', sans-serif; /* Police simple et moderne */
-    margin-bottom: 20px; /* Espace en bas */
-}
-
-.login-form {
+/* Conteneur principal */
+.loginPage {
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: url(../../assets/images/imageFond.webp) no-repeat center center/cover; /* Image de fond */
     display: flex;
-    flex-direction: column; /* Organisation en colonne */
-}
-
-.form-group {
-    margin-bottom: 18px; /* Espacement entre les champs */
-}
-
-label {
-    font-weight: bold; /* Texte en gras pour les étiquettes */
-    color: #333; /* Couleur de l’étiquette */
-    margin-bottom: 5px; /* Espace sous l’étiquette */
-    display: block; /* Force le label à occuper toute la ligne */
-}
-
-input {
-    padding: 12px; /* Espace intérieur du champ */
-    border: 1px solid #ccc; /* Bordure claire */
-    border-radius: 5px; /* Coins arrondis */
-    font-size: 16px;
-    transition: border-color 0.3s; /* Transition douce */
-    width: 100%; /* Largeur du champ */
-}
-
-input:focus {
-    border-color: #c0392b; /* Bordure rouge italienne au focus */
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  
+  .login-container {
+    position: relative;
+    max-width: 460px; /* Largeur maximale fixe */
+    width: 100%; /* S'adapte à la largeur de l'écran */
+    padding: 30px 20px; /* Espacement interne */
+    background: rgba(255, 255, 255, 0.95); /* Fond blanc semi-transparent */
+    border-radius: 12px; /* Coins arrondis */
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3); /* Ombre subtile */
+    text-align: center;
+    font-family: 'Arial', sans-serif;
+    box-sizing: border-box; /* Assure que le padding est inclus dans la largeur */
+  }
+  
+  /* Titre */
+  .h2Login {
+    color: #c0392b;
+    font-size: 1.8rem;
+    margin-bottom: 30px;
+  }
+  
+  /* Formulaire */
+  .login-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+  }
+  
+  .form-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  input {
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 1rem;
+    width: 100%; /* Assure que le champ ne dépasse pas */
+    background: rgba(255, 255, 255, 0.8); /* Fond blanc légèrement transparent */
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1); /* Effet d'ombrage intérieur */
+    transition: all 0.3s ease;
+    box-sizing: border-box; /* Inclut le padding dans la largeur */
+  }
+  
+  input:focus {
+    border-color: #c0392b;
     outline: none;
-}
-
-.submit-button {
+    background: rgba(255, 255, 255, 1);
+  }
+  
+  /* Bouton principal */
+  .submit-button {
     background-color: #c0392b;
     color: white;
     padding: 12px;
     border: none;
-    border-radius: 5px;
+    border-radius: 8px;
     cursor: pointer;
-    font-size: 16px;
-    margin-top: 15px; /* Espace supérieur */
-    transition: background-color 0.3s;
-}
-
-.submit-button:hover {
-    background-color: #e74c3c; /* Rouge plus clair au survol */
-}
-
-.error {
-    color: #e74c3c; /* Texte rouge pour les erreurs */
+    font-size: 1rem;
+    transition: all 0.3s ease;
+  }
+  
+  .submit-button:hover {
+    background-color: #e74c3c;
+  }
+  
+  /* Bouton secondaire */
+  .register-button {
+    background-color: transparent;
+    color: #c0392b;
+    padding: 12px;
+    border: 1px solid #c0392b;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 1rem;
+    margin-top: 10px;
+    transition: all 0.3s ease;
+  }
+  
+  .register-button:hover {
+    background-color: #c0392b;
+    color: white;
+  }
+  
+  /* Texte des erreurs */
+  .error {
+    color: #e74c3c;
     font-size: 14px;
-    text-align: center;
     margin-bottom: 15px;
-}
-
-/* Responsive design pour les petits écrans */
-@media (max-width: 768px) {
+  }
+  
+  /* Responsiveness */
+  @media (max-width: 768px) {
     .login-container {
-        padding: 20px; /* Ajustement du padding sur petits écrans */
+      padding: 20px;
     }
-}
+  
+    .submit-button,
+    .register-button {
+      font-size: 14px;
+      padding: 10px;
+    }
+  
+    input {
+      font-size: 14px;
+      padding: 10px;
+    }
+  }
+  
+
+  

@@ -23,6 +23,6 @@ public class Recompense {
     private LocalDate dateRemise;
     private String codeRemise;
     @ManyToOne
-    @JoinColumn(name = "user_id")  // Assurez-vous que cette colonne existe dans votre table
+    @JoinColumn(name = "user_id")
     private Utilisateur user;
 }

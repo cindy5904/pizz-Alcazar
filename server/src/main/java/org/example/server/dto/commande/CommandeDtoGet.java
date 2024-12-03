@@ -16,6 +16,7 @@ import java.util.List;
 @NoArgsConstructor
 public class CommandeDtoGet {
     private Long id;
+    private String numeroCommande;
     private String detailsCommande;
     private EtatCommande statut;
     private String adresseLivraison;

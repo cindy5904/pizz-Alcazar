@@ -131,15 +131,15 @@ public class ProduitService {
                 .collect(Collectors.toList());
     }
 
-    // Récupérer tous les produits d'une catégorie
     public List<ProduitDtoGet> getProduitsParCategorie(Long categorieId) {
+        System.out.println("Categorie ID reçu : " + categorieId);
         List<Produit> produitsParCategorie = produitRepository.findByCategorieId(categorieId);
+        System.out.println("Produits trouvés pour la catégorie : " + produitsParCategorie.size());
         return produitsParCategorie.stream()
                 .map(this::mapToDtoGet)
                 .collect(Collectors.toList());
     }
 
-    // Récupérer des produits par leur nom
     public List<ProduitDtoGet> getProduitsParNom(String nom) {
         List<Produit> produits = produitRepository.findByNom(nom);
         return produits.stream()

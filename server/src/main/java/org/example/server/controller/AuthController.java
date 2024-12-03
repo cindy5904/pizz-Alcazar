@@ -1,9 +1,6 @@
 package org.example.server.controller;
 
-import org.example.server.dto.user.LoginDto;
-import org.example.server.dto.user.LoginResponse;
-import org.example.server.dto.user.RegisterDto;
-import org.example.server.dto.user.UtilisateurDtoGet;
+import org.example.server.dto.user.*;
 import org.example.server.entity.Role;
 import org.example.server.entity.Utilisateur;
 import org.example.server.service.AuthService;
@@ -62,9 +59,29 @@ public class AuthController {
         utilisateurDto.setNom(utilisateur.getNom());
         utilisateurDto.setPrenom(utilisateur.getPrenom());
         utilisateurDto.setEmail(utilisateur.getEmail());
+        utilisateurDto.setAdresse(utilisateur.getAdresse());
+        utilisateurDto.setTelephone(utilisateur.getTelephone());
+        utilisateurDto.setPointsFidelite(utilisateur.getPointsFidelite());
         utilisateurDto.setRoles(roles);
 
         return ResponseEntity.ok(utilisateurDto);
     }
+    @PutMapping("/update")
+    public ResponseEntity<UtilisateurDtoGet> updateUser(@RequestBody UtilisateurDtoPost updatedUser, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()) {
+            return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+        }
+
+        Utilisateur utilisateur = (Utilisateur) authentication.getPrincipal();
+
+        System.out.println("Reçu PUT pour utilisateur authentifié ID : " + utilisateur.getId());
+        System.out.println("Données à mettre à jour : " + updatedUser);
+
+        UtilisateurDtoGet updatedDto = authService.updateUser(utilisateur.getId(), updatedUser);
+
+        return ResponseEntity.ok(updatedDto);
+    }
+
+
 
 }

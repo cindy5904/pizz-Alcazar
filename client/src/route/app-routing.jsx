@@ -9,6 +9,9 @@ import CategorieForm from "../componant/categorie/categorieForm/CategorieForm";
 import Panier from "../componant/panier/Panier";
 import Paiement from "../componant/paiement/Paiement";
 import Commandes from "../componant/commande/Commande";
+import PagePaiement from "../componant/paiement/PagePaiement";
+import ClientDashboard from "../componant/utilisateur/client/ClientDashboard";
+import InfoModifClient from "../componant/utilisateur/client/edit/InfoModifClient";
 
 const router = createBrowserRouter([
     {
@@ -27,7 +30,7 @@ const router = createBrowserRouter([
     },
     {
         path: "/produits/ajouter",
-        element: <ProduitForm />, // Formulaire pour ajouter un produit
+        element: <ProduitForm />, 
     },
     {
         path: "/produits/modifier/:id", 
@@ -42,9 +45,14 @@ const router = createBrowserRouter([
         element: <ProduitListe />, 
     },
     {
+        path: "/formcategorie",
+        element: <CategorieForm />, 
+    },
+    {
         path: "/categories",
         element: <CategoriesPage />, 
     },
+
     {
         path: "/panier",
         element: <Panier />, 
@@ -57,6 +65,20 @@ const router = createBrowserRouter([
         path: "/commande",
         element: <Commandes />, 
     }, 
+    {
+        path: "/page-paiement",
+        element: <PagePaiement />, 
+    },
+    {
+        path: "/mon-compte",
+        element: <ClientDashboard />, 
+    },
+    {
+        path: "/mon-compte/modifier", 
+        element: <InfoModifClient />,
+    },
+
+
 
     
     

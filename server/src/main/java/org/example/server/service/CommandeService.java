@@ -15,6 +15,7 @@ import org.example.server.repository.PaiementRepository;
 import org.example.server.repository.PanierRepository;
 import org.example.server.repository.UtilisateurRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -31,14 +32,15 @@ public class CommandeService {
     private UtilisateurRepository utilisateurRepository;
 
     @Autowired
-    private PanierRepository panierRepository; // Ajout du PanierRepository
+    private PanierRepository panierRepository;
 
     @Autowired
-    private PaiementRepository paiementRepository; // Ajout du PaiementRepository
+    private PaiementRepository paiementRepository;
 
     public CommandeDtoGet convertToDto(Commande commande) {
         CommandeDtoGet dto = new CommandeDtoGet();
         dto.setId(commande.getId());
+        dto.setNumeroCommande(commande.getNumeroCommande());
         dto.setDetailsCommande(commande.getDetailsCommande());
         dto.setStatut(commande.getStatut());
         dto.setAdresseLivraison(commande.getAdresseLivraison());
@@ -52,11 +54,20 @@ public class CommandeService {
         if (commande.getPanier() != null) {
             dto.setPanierId(commande.getPanier().getId());
         }
+        if (commande.getPaiement() != null) {
+            dto.setPaiementId(commande.getPaiement().getId());
+        } else {
+
+            paiementRepository.findById(commande.getId()).ifPresent(paiement -> {
+                dto.setPaiementId(paiement.getId());
+            });
+        }
 
         List<CommandeItemDtoGet> itemsDto = commande.getItemsCommande().stream()
                 .map(this::convertCommandeItemToDto)
                 .collect(Collectors.toList());
         dto.setItemsCommande(itemsDto);
+        System.out.println("Items convertis en DTO : " + itemsDto);
 
         return dto;
     }
@@ -68,6 +79,9 @@ public class CommandeService {
         dto.setProduitId(item.getProduit().getId());
         dto.setProduitNom(item.getProduit().getNom());
         dto.setProduitPrix(item.getProduit().getPrix());
+        dto.setCommandeId(item.getCommande().getId());
+        System.out.println("Commande ID pour l'item : " + item.getCommande().getId());
+
         return dto;
     }
 
@@ -101,17 +115,27 @@ public class CommandeService {
 
 
     public CommandeDtoGet getCommandeById(Long id) {
-        Commande commande = commandeRepository.findById(id)
+        Commande commande = commandeRepository.findByIdWithItems(id)
                 .orElseThrow(() -> new ResourceNotFoundException("Commande non trouvée avec l'ID: " + id));
         return convertToDto(commande);
     }
 
-    public List<CommandeDtoGet> getAllCommandes(Pageable pageable) {
-        return commandeRepository.findAll(pageable)
-                .stream()
-                .map(this::convertToDto)
-                .collect(Collectors.toList());
+
+    public Page<CommandeDtoGet> getAllCommandes(Long userId, Pageable pageable) {
+        if (userId == null) {
+            throw new IllegalArgumentException("L'ID de l'utilisateur est requis pour récupérer les commandes.");
+        }
+
+        // Utilisez directement le `Page` retourné par le repository
+        Page<Commande> commandesPage = commandeRepository.findByUserId(userId, pageable);
+
+        // Transformez les éléments de `Page<Commande>` en `Page<CommandeDtoGet>`
+        return commandesPage.map(this::convertToDto);
     }
+
+
+
+
 
 
     public void deleteCommande(Long id) {

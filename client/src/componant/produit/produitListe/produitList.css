@@ -1,7 +1,7 @@
 .produit-container {
     max-width: 1200px;
     margin: auto;
-    padding: 20px;
+    padding-top: 100px;
     background-color: #f9f3e5; /* Arrière-plan doux */
     border-radius: 10px;
 }

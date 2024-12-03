@@ -39,8 +39,18 @@ const PanierItemService = {
     supprimerItem: async (panierId, produitId) => {
         const response = await axios.delete(`${API_URL}/${panierId}/${produitId}`);
         return response.data;
-    }
+    },
+    ajouterQuantiteItem: async (panierId, produitId) => {
+        const itemData = {
+            produitId: produitId,
+            quantite: 1, 
+        };
+        const response = await axios.post(`${API_URL}/${panierId}`, itemData);
+        return response.data;
+    },
+    
     
 };
+
 
 export default PanierItemService;

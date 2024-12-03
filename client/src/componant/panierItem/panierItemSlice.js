@@ -12,6 +12,19 @@ export const ajouterOuMettreAJourItem = createAsyncThunk(
     return response;
   }
 );
+export const ajouterQuantiteItem = createAsyncThunk(
+  "panierItem/ajouterQuantiteItem",
+  async ({ panierId, produitId }, { dispatch }) => {
+    const itemData = { produitId, quantite: 1 }; 
+    const response = await PanierItemService.ajouterOuMettreAJourItem(
+      panierId,
+      itemData
+    );
+    await dispatch(fetchPanierByUserId(panierId));
+    return response;
+  }
+);
+
 
 export const reduireQuantiteItem = createAsyncThunk(
   "panierItem/reduireQuantiteItem",
@@ -53,6 +66,24 @@ const panierItemSlice = createSlice({
         state.items.push(action.payload);
       })
       .addCase(ajouterOuMettreAJourItem.rejected, (state, action) => {
+        state.loading = false;
+        state.error = action.error.message;
+      })
+      .addCase(ajouterQuantiteItem.pending, (state) => {
+        state.loading = true;
+        state.error = null;
+      })
+      .addCase(ajouterQuantiteItem.fulfilled, (state, action) => {
+        state.loading = false;
+        const item = state.items.find((i) => i.id === action.payload.id);
+        if (item) {
+          item.quantite = action.payload.quantite; 
+        } else {
+          state.items.push(action.payload); 
+        }
+      })
+      
+      .addCase(ajouterQuantiteItem.rejected, (state, action) => {
         state.loading = false;
         state.error = action.error.message;
       })

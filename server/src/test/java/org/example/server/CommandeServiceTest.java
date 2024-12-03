@@ -18,6 +18,10 @@ import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
 import org.springframework.context.annotation.Import;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -247,17 +251,26 @@ public class CommandeServiceTest {
     }
 
     @Test
-    public void recupererToutesLesCommandes_ShouldReturnListOfCommandes() {
+    public void recupererToutesLesCommandesParUtilisateur_ShouldReturnListOfCommandes() {
         // Arrange
-        when(commandeRepository.findAll()).thenReturn(List.of(commande));
+        Long userId = 1L; // ID de l'utilisateur pour le test
+        Pageable pageable = PageRequest.of(0, 10); // Pagination pour le test
+        Commande commande = new Commande();
+        commande.setDetailsCommande("Pizza Margherita");
+        commande.setUser(new Utilisateur(userId)); // Associer la commande à l'utilisateur
+
+        Page<Commande> commandesPage = new PageImpl<>(List.of(commande)); // Simuler une page contenant une commande
+        when(commandeRepository.findByUserId(userId, pageable)).thenReturn(commandesPage);
 
         // Act
-        List<CommandeDtoGet> resultat = commandeService.getAllCommandes();
+        List<CommandeDtoGet> resultat = commandeService.getAllCommandes(userId, pageable);
 
         // Assert
         assertEquals(1, resultat.size());
         assertEquals("Pizza Margherita", resultat.get(0).getDetailsCommande());
+        assertEquals(userId, resultat.get(0).getUserId());
     }
+
 
     @Test
     public void mettreAJourCommande_ShouldReturnUpdatedCommandeDtoGet() {

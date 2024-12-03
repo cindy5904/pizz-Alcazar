@@ -8,6 +8,9 @@ import {
     supprimerCommande,
     definirPage,
 } from '../commande/commandeSlice';
+import Header from '../../shared/header/Header';
+import Navbar from '../../shared/navbar/Navbar';
+import "../commande/commande.css"
 
 const Commandes = () => {
     const dispatch = useDispatch();
@@ -18,29 +21,36 @@ const Commandes = () => {
     const [detailsCommande, setDetailsCommande] = useState('');
 
     useEffect(() => {
-        dispatch(obtenirToutesCommandes({ page }));
-    }, [dispatch, page]);
+        if (utilisateur && utilisateur.id) {
+            dispatch(obtenirToutesCommandes({ userId: utilisateur.id, page }));
+        } else {
+            console.error("Utilisateur non connecté. Impossible de récupérer les commandes.");
+        }
+    }, [dispatch, utilisateur, page]);
 
-    
     const handleObtenirCommandeParId = () => {
         if (commandeId) {
             dispatch(obtenirCommandeParId(commandeId));
         }
     };
 
-    
     const handleCreerCommande = () => {
+        if (!utilisateur || !utilisateur.id || !panier || !panier.id) {
+            console.error("Utilisateur ou panier invalide. Impossible de créer une commande.");
+            return;
+        }
+
         const nouvelleCommande = {
             detailsCommande,
             statut: 'EN_COURS',
-            userId: 1, // Exemple d'ID utilisateur
-            panierId: 1, // Exemple d'ID panier
+            userId: utilisateur.id,
+            panierId: panier.id,
         };
+
         dispatch(creerCommande(nouvelleCommande));
         setDetailsCommande('');
     };
 
-    // Gérer la mise à jour d'une commande
     const handleMettreAJourCommande = (id) => {
         const donneesMiseAJour = {
             detailsCommande: 'Commande mise à jour',
@@ -49,12 +59,10 @@ const Commandes = () => {
         dispatch(mettreAJourCommande({ id, donneesMiseAJour }));
     };
 
-    // Gérer la suppression d'une commande
     const handleSupprimerCommande = (id) => {
         dispatch(supprimerCommande(id));
     };
 
-    // Gérer la pagination
     const handlePagePrecedente = () => {
         if (page > 0) {
             dispatch(definirPage(page - 1));
@@ -68,56 +76,63 @@ const Commandes = () => {
     };
 
     return (
-        <div>
-            <h1>Liste des Commandes</h1>
+        <>
+        <Header/>
+        <Navbar/>
+        <div className="commande-container">
+        <h1>Liste des Commandes</h1>
 
-            {chargement && <p>Chargement...</p>}
-            {erreur && <p>Erreur : {erreur}</p>}
+        {chargement && <p>Chargement...</p>}
+        {erreur && <p style={{ color: 'red' }}>Erreur : {erreur}</p>}
 
-            <div>
-                <h2>Créer une nouvelle commande</h2>
-                <input
-                    type="text"
-                    placeholder="Détails de la commande"
-                    value={detailsCommande}
-                    onChange={(e) => setDetailsCommande(e.target.value)}
-                />
-                <button onClick={handleCreerCommande}>Créer</button>
-            </div>
-
-            <div>
-                <h2>Rechercher une commande par ID</h2>
-                <input
-                    type="text"
-                    placeholder="ID de la commande"
-                    value={commandeId}
-                    onChange={(e) => setCommandeId(e.target.value)}
-                />
-                <button onClick={handleObtenirCommandeParId}>Rechercher</button>
-            </div>
-
-            <ul>
+        {commandes.length > 0 ? (
+          <>
+            <table className="commande-table">
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Numéro de Commande</th>
+                  <th>Statut</th>
+                  <th>Produits</th>
+                </tr>
+              </thead>
+              <tbody>
                 {commandes.map((commande) => (
-                    <li key={commande.id}>
-                        <p>Commande ID : {commande.id}</p>
-                        <p>Détails : {commande.detailsCommande}</p>
-                        <p>Statut : {commande.statut}</p>
-                        <button onClick={() => handleMettreAJourCommande(commande.id)}>Mettre à jour</button>
-                        <button onClick={() => handleSupprimerCommande(commande.id)}>Supprimer</button>
-                    </li>
+                  <tr key={commande.id}>
+                    <td>{commande.id}</td>
+                    <td>{commande.numeroCommande}</td>
+                    <td>{commande.statut}</td>
+                    <td>
+                      <ul>
+                        {commande.itemsCommande.map((item) => (
+                          <li key={item.id}>
+                            {item.produitNom} (x{item.quantite}) - {item.produitPrix}€
+                          </li>
+                        ))}
+                      </ul>
+                    </td>
+                  </tr>
                 ))}
-            </ul>
+              </tbody>
+            </table>
 
-            <div>
-                <button onClick={handlePagePrecedente} disabled={page === 0}>
-                    Précédente
-                </button>
-                <span>Page {page + 1} / {totalPages}</span>
-                <button onClick={handlePageSuivante} disabled={page === totalPages - 1}>
-                    Suivante
-                </button>
+            <div className="pagination-buttons">
+              <button onClick={handlePagePrecedente} disabled={page === 0}>
+                Page Précédente
+              </button>
+              <p>
+                Page {page + 1} sur {totalPages}
+              </p>
+              <button onClick={handlePageSuivante} disabled={page >= totalPages - 1}>
+                Page Suivante
+              </button>
             </div>
-        </div>
+          </>
+        ) : (
+          <p>Aucune commande trouvée.</p>
+        )}
+      </div>
+        </>
     );
 };
 

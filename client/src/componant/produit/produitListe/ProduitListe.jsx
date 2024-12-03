@@ -1,43 +1,53 @@
 import React, { useEffect } from "react";
 import Header from "../../../shared/header/Header";
 import Navbar from "../../../shared/navbar/Navbar";
-import { obtenirProduitsDisponibles, supprimerProduit } from "../produitSlice";
+import { obtenirProduitsDisponibles, supprimerProduit, obtenirProduitsParCategorie } from "../produitSlice";
 import { useDispatch, useSelector } from "react-redux";
 import "./produitList.css";
-import { useNavigate } from "react-router-dom";
+import { useLocation, useNavigate } from "react-router-dom";
 import { ajouterOuMettreAJourItem, fetchPanierByUserId } from '../../panier/panierSlice';
+import Footer from "../../../shared/footer/Footer";
 
 
 
 const ProduitListe = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const produits = useSelector((state) => state.produit.items);
   const chargement = useSelector((state) => state.produit.chargement);
   const erreur = useSelector((state) => state.produit.erreur);
   const panier = useSelector((state) => state.panier.panier);
   const user = useSelector((state) => state.auth.user);
   const roles = user ? user.roles : [];
+  const categorieId = location.state?.categorieId; 
+    console.log("ID de la catégorie :", categorieId);
   console.log("Rôles de l'utilisateur dans ProduitListe :", roles);
 
   useEffect(() => {
-    dispatch(obtenirProduitsDisponibles()); 
-  }, [dispatch]);
+    if (categorieId) {
+        console.log("Récupération des produits pour la catégorie :", categorieId);
+        dispatch(obtenirProduitsParCategorie(categorieId));
+    } else {
+        console.log("Récupération de tous les produits disponibles");
+        dispatch(obtenirProduitsDisponibles());
+    }
+}, [dispatch, categorieId]);
 
   const handleAddToCart = (produitId) => {
     if (!user) {
         console.error("Utilisateur non authentifié");
-        return; // Ne pas procéder si l'utilisateur n'est pas authentifié
+        return; 
     }
 
     console.log("ID de l'utilisateur :", user.id);
 
     const itemData = {
         produitId: produitId,
-        quantite: 1 // Quantité par défaut pour chaque ajout
+        quantite: 1 
     };
 
-    // Appel pour ajouter ou mettre à jour l'item dans le panier de l'utilisateur
+    
     dispatch(ajouterOuMettreAJourItem({ userId: user.id, produitId, quantite: 1 }))
         .then(response => {
             console.log("Panier mis à jour avec succès : ", response);
@@ -64,7 +74,7 @@ const ProduitListe = () => {
 
   return (
     <>
-    <Header />
+    
         <Navbar />
         <div className="produit-container">
             <h1 className="produit-titre">Nos Délicieuses Pizzas</h1>
@@ -104,6 +114,7 @@ const ProduitListe = () => {
                 )}
             </div>
         </div>
+        <Footer/>
     </>
   );
 };

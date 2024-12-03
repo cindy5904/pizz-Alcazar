@@ -18,6 +18,8 @@ public class Commande {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    @Column(unique = true, nullable = false)
+    private String numeroCommande;
     private String detailsCommande;
     @Enumerated(EnumType.STRING)
     private EtatCommande statut;
@@ -27,7 +29,7 @@ public class Commande {
     @ManyToOne
     @JoinColumn(name = "user_id")
     private Utilisateur user;
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "paiement_id")
     private Paiement paiement;
     @OneToOne
@@ -35,4 +37,10 @@ public class Commande {
     private Panier panier;
     @OneToMany(mappedBy = "commande", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private List<CommandeItem> itemsCommande;
+    @PrePersist
+    private void generateNumeroCommande() {
+        if (this.numeroCommande == null) {
+            this.numeroCommande = "CMD-" + System.currentTimeMillis();
+        }
+    }
 }

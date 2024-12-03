@@ -4,6 +4,8 @@ import { loginUser } from './authSlice';
 import { useNavigate } from 'react-router-dom';
 import '../auth/login.css';
 import Header from '../../shared/header/Header';
+import Navbar from '../../shared/navbar/Navbar';
+import Footer from '../../shared/footer/Footer';
 
 const Login = () => {
   const [email, setEmail] = useState('');
@@ -33,9 +35,12 @@ const Login = () => {
 
   return (
     <>
-    <Header/>
+    <Navbar/>
+    
+    <div className="loginPage">
+  <div className="overlay">
     <div className="login-container">
-      <h2>Connexion</h2>
+      <h2 className='h2Login'>Connexion</h2>
       {error && <p className="error">{error}</p>}
       <form onSubmit={handleSubmit} className="login-form">
         <div className="form-group">
@@ -59,8 +64,20 @@ const Login = () => {
         <button type="submit" className="submit-button" disabled={loading}>
           {loading ? 'Chargement...' : 'Se connecter'}
         </button>
+        <button
+          type="button"
+          className="register-button"
+          onClick={() => navigate('/register')}
+        >
+          Pas encore de compte ?
+        </button>
       </form>
     </div>
+  </div>
+</div>
+
+    
+    <Footer/>
     </>
   );
 };

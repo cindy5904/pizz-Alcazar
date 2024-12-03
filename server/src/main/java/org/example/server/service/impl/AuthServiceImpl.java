@@ -2,9 +2,7 @@ package org.example.server.service.impl;
 
 import jakarta.transaction.Transactional;
 import org.example.server.config.jwt.JwtTokenProvider;
-import org.example.server.dto.user.LoginDto;
-import org.example.server.dto.user.LoginResponse;
-import org.example.server.dto.user.RegisterDto;
+import org.example.server.dto.user.*;
 import org.example.server.entity.Role;
 import org.example.server.entity.Utilisateur;
 import org.example.server.exception.AppException;
@@ -82,7 +80,7 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
             SecurityContextHolder.getContext().setAuthentication(authentication);
             String token = jwtTokenProvider.generateToken(authentication);
 
-            // Vérification du type de `principal`
+
             Object principal = authentication.getPrincipal();
             Utilisateur utilisateur;
             if (principal instanceof Utilisateur) {
@@ -93,13 +91,23 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
                 throw new IllegalStateException("Type de principal inattendu : " + principal.getClass().getName());
             }
 
-            // Récupération des rôles de l'utilisateur
+
             Set<String> roles = utilisateur.getUserRoles().stream()
                     .map(Role::getName)
                     .collect(Collectors.toSet());
 
-//            return new LoginResponse(token, roles, utilisateur.getId());
-            LoginResponse loginResponse = new LoginResponse(token, roles, utilisateur.getId());
+
+            LoginResponse loginResponse = new LoginResponse(
+                    token,
+                    roles,
+                    utilisateur.getId(),
+                    utilisateur.getNom(),
+                    utilisateur.getPrenom(),
+                    utilisateur.getEmail(),
+                    utilisateur.getAdresse(),
+                    utilisateur.getTelephone(),
+                    utilisateur.getPointsFidelite()
+            );
             System.out.println("Contenu de LoginResponse avant retour : " + loginResponse); // Log pour vérifier le contenu
             return loginResponse;
         } catch (InternalAuthenticationServiceException e) {
@@ -137,5 +145,29 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
     public void logout() {
         // Supprime l'authentification de l'utilisateur
         SecurityContextHolder.clearContext();
+    }
+    @Override
+    @Transactional
+    public UtilisateurDtoGet updateUser(Long userId, UtilisateurDtoPost updatedUser) {
+        Utilisateur utilisateur = utilisateurRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("Utilisateur non trouvé"));
+
+        utilisateur.setNom(updatedUser.getNom());
+        utilisateur.setPrenom(updatedUser.getPrenom());
+        utilisateur.setAdresse(updatedUser.getAdresse());
+        utilisateur.setTelephone(updatedUser.getTelephone());
+
+        utilisateurRepository.save(utilisateur);
+
+        return new UtilisateurDtoGet(
+                utilisateur.getId(),
+                utilisateur.getNom(),
+                utilisateur.getPrenom(),
+                utilisateur.getEmail(),
+                utilisateur.getAdresse(),
+                utilisateur.getTelephone(),
+                utilisateur.getPointsFidelite(),
+                utilisateur.getUserRoles().stream().map(Role::getName).collect(Collectors.toSet())
+        );
     }
 }

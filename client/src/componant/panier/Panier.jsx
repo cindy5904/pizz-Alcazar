@@ -3,12 +3,14 @@ import { useDispatch, useSelector } from "react-redux";
 import { fetchPanierByUserId, supprimerPanier, reinitialiserPanier } from "./panierSlice";
 import {
   reduireQuantiteItem,
-  supprimerItem,
+  supprimerItem, ajouterQuantiteItem
 } from "../panierItem/panierItemSlice";
 import { creerCommande } from "../commande/commandeSlice";
 import Header from "../../shared/header/Header";
 import Navbar from "../../shared/navbar/Navbar";
 import { useLocation, useNavigate } from "react-router-dom";
+import "./panier.css";
+import Footer from "../../shared/footer/Footer";
 
 const Panier = () => {
   const dispatch = useDispatch();
@@ -74,8 +76,6 @@ const Panier = () => {
 
             if (action.payload && action.payload.id) {
                 console.log("Commande créée avec succès. ID de la commande :", action.payload.id);
-
-                // Rediriger vers la page de paiement
                 navigate("/paiement", { state: { commandeId: action.payload.id } });
             } else {
                 console.log("Erreur lors de la création de la commande.");
@@ -87,40 +87,82 @@ const Panier = () => {
             console.log("Erreur lors de la création de la commande.");
         });
 };
+const calculateTotal = () => {
+  if (!panier || !panier.itemsPanier) return 0;
+
+  return panier.itemsPanier.reduce((total, item) => {
+    return total + item.produit.prix * item.quantite;
+  }, 0);
+};
+const handleIncreaseQuantity = (panierId, produitId) => {
+  dispatch(
+    ajouterQuantiteItem({
+      panierId: panierId,
+      produitId: produitId,
+    })
+  ).then(() => dispatch(fetchPanierByUserId(userId)));
+};
+
+
+
 
   return (
     <>
-      <Header />
+      
       <Navbar />
 
-      <div>
-        <h1>Mon Panier</h1>
-        {panier && panier.itemsPanier && panier.itemsPanier.length > 0 ? (
-          <ul>
-            {panier.itemsPanier.map((item) => (
-              <li key={item.id}>
-                <h2>{item.produit.nom}</h2>
-                <p>Quantité : {item.quantite}</p>
-                <button
-                  onClick={() =>
-                    handleReduceQuantity(item.produit.id, item.quantite)
-                  }
-                >
-                  Réduire
-                </button>
+      <div className="panier-container">
+  <h1 className="panier-title">Mon Panier</h1>
+  {panier && panier.itemsPanier && panier.itemsPanier.length > 0 ? (
+    <div className="panier-items">
+      {panier.itemsPanier.map((item) => (
+       <div className="panier-item" key={item.id}>
+       <div className="panier-item-details">
+         <h2 className="panier-item-title">{item.produit.nom}</h2>
+       </div>
+       <div className="panier-item-actions">
+         <button
+           className="btn-symbol"
+           onClick={() => handleReduceQuantity(item.produit.id, item.quantite)}
+         >
+           -
+         </button>
+         <span className="quantity-display">{item.quantite}</span>
+         <button
+    className="btn-symbol"
+    onClick={() => handleIncreaseQuantity(panier.id, item.produit.id)}
+  >
+    +
+  </button>
 
-                <button onClick={() => handleDeleteItem(item.produit.id)}>
-                  Supprimer
-                </button>
-              </li>
-            ))}
-          </ul>
-        ) : (
-          <p>Votre panier est vide.</p>
-        )}
-        <button onClick={handleProceedToPayment}>Procéder à la commande</button>
-
-      </div>
+         <button
+           className="btn-symbol btn-delete"
+           onClick={() => handleDeleteItem(item.produit.id)}
+         >
+           X
+         </button>
+       </div>
+     
+       {/* Nom du Produit */}
+       
+     
+       {/* Prix */}
+       <p className="panier-item-price">{item.produit.prix}€</p>
+     </div>
+     
+      ))}
+    </div>
+  ) : (
+    <p className="panier-empty">Votre panier est vide.</p>
+  )}
+  <div className="panier-summary">
+    <h2>Total : {calculateTotal().toFixed(2)}€</h2>
+    <button className="btn-proceed" onClick={handleProceedToPayment}>
+      Procéder à la commande
+    </button>
+  </div>
+</div>
+      <Footer/>
     </>
   );
 };

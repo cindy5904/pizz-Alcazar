@@ -1,8 +1,6 @@
 package org.example.server.service;
 
-import org.example.server.dto.user.LoginDto;
-import org.example.server.dto.user.LoginResponse;
-import org.example.server.dto.user.RegisterDto;
+import org.example.server.dto.user.*;
 import org.springframework.security.core.userdetails.UserDetails;
 
 public interface AuthService {
@@ -16,4 +14,5 @@ public interface AuthService {
     UserDetails loadUserByEmail(String email);
 
     void logout();
+    UtilisateurDtoGet updateUser(Long userId, UtilisateurDtoPost updatedUser);
 }

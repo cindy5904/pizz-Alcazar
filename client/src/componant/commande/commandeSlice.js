@@ -29,15 +29,19 @@ export const obtenirCommandeParId = createAsyncThunk(
 
 export const obtenirToutesCommandes = createAsyncThunk(
     'commandes/obtenirToutesCommandes',
-    async ({ page = 0, taille = 10 }, { rejectWithValue }) => {
+    async ({ userId, page = 0, taille = 10 }, { rejectWithValue }) => {
         try {
-            const reponse = await CommandeService.obtenirToutesCommandes(page, taille);
-            return reponse;
+            if (!userId) {
+                throw new Error("userId est requis pour récupérer les commandes.");
+            }
+            const reponse = await CommandeService.obtenirToutesCommandes(userId, page, taille);
+            return reponse; 
         } catch (erreur) {
-            return rejectWithValue(erreur.response.data);
+            return rejectWithValue(erreur.response?.data || "Erreur lors de la récupération des commandes.");
         }
     }
 );
+
 
 // 4. Mettre à jour une commande
 export const mettreAJourCommande = createAsyncThunk(
@@ -75,6 +79,8 @@ const commandeSlice = createSlice({
         page: 0,
         taille: 10,
         totalPages: 0,
+        
+    totalElements: 0, 
     },
     reducers: {
         definirPage: (state, action) => {
@@ -99,6 +105,7 @@ const commandeSlice = createSlice({
             })
             .addCase(obtenirCommandeParId.pending, (state) => { state.chargement = true; state.erreur = null; })
             .addCase(obtenirCommandeParId.fulfilled, (state, action) => {
+                console.log("Commande récupérée via Redux obtenir commande par id fulfilled :", action.payload);
                 state.chargement = false;
                 state.commandeActuelle = action.payload;
                 const index = state.commandes.findIndex((c) => c.id === action.payload.id);
@@ -110,10 +117,36 @@ const commandeSlice = createSlice({
             })
             .addCase(obtenirCommandeParId.rejected, (state, action) => { state.chargement = false; state.erreur = action.payload; })
             .addCase(obtenirToutesCommandes.fulfilled, (state, action) => {
+                console.log("Payload brut dans fulfilled :", action.payload);
+            
                 state.chargement = false;
-                state.commandes = action.payload.content;
-                state.totalPages = action.payload.totalPages;
+            
+                
+                if (action.payload && action.payload.content) {
+                    state.commandes = action.payload.content; 
+                    state.page = action.payload.pageable.pageNumber; 
+                    state.taille = action.payload.pageable.pageSize; 
+                    state.totalPages = action.payload.totalPages; 
+                    state.totalElements = action.payload.totalElements || 0; 
+                } else {
+                    console.error("Payload inattendu :", action.payload);
+                    state.commandes = []; 
+                    state.totalPages = 0;
+                    state.page = 0;
+                    state.totalElements = 0;
+                }
+            
+                console.log("State après mise à jour :", state);
             })
+            
+            
+            .addCase(obtenirToutesCommandes.rejected, (state, action) => {
+                state.chargement = false;
+                state.erreur = action.payload || "Erreur lors de la récupération des commandes.";
+                console.error("Erreur lors de la récupération des commandes :", action.payload);
+            })
+            
+            
             .addCase(mettreAJourCommande.fulfilled, (state, action) => {
                 state.chargement = false;
                 const index = state.commandes.findIndex((c) => c.id === action.payload.id);

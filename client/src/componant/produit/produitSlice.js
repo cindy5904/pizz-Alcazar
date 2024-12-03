@@ -153,6 +153,7 @@ const produitSlice = createSlice({
                 state.erreur = null;
             })
             .addCase(obtenirProduitsParCategorie.fulfilled, (state, action) => {
+                console.log("Produits récupérés :", action.payload);
                 state.chargement = false;
                 state.items = action.payload;
             })
