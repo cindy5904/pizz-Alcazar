@@ -115,7 +115,7 @@ const ProduitForm = () => {
             <Header />
             <Navbar />
             <div className="product-form-container">
-                <h2>{id ? 'Modifier le produit' : 'Ajouter un produit'}</h2>
+                <h2 className='h2ProduitForm'>{id ? 'Modifier le produit' : 'Ajouter un produit'}</h2>
                 <form className="product-form" onSubmit={handleSubmit}>
                     <div className="form-group">
                         <label>Nom:</label>
@@ -193,7 +193,7 @@ const ProduitForm = () => {
                             onChange={handleChange}
                         />
                     </div>
-                    <button type="submit">{id ? 'Modifier' : 'Ajouter'}</button>
+                    <button className='buttonProduitForm' type="submit">{id ? 'Modifier' : 'Ajouter'}</button>
                 </form>
             </div>
         </>

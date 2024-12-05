@@ -9,7 +9,7 @@
     box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
 }
 
-h2 {
+.h2ProduitForm {
     text-align: center;
     color: #c0392b;
     font-family: 'Arial', sans-serif;
@@ -49,7 +49,7 @@ input[type="checkbox"] {
     margin-left: 5px;
 }
 
-button {
+.buttonProduitForm {
     background-color: #c0392b;
     color: white;
     padding: 12px;
@@ -61,7 +61,7 @@ button {
     margin-top: 15px;
 }
 
-button:hover {
+.buttonProduitForm:hover {
     background-color: #e74c3c;
 }
 

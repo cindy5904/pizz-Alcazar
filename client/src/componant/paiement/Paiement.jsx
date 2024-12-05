@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { useLocation, useNavigate } from "react-router-dom";
-import { obtenirPaiementParId, creerPaiement } from "../paiement/paiementSlice";
+import { obtenirPaiementParId, creerPaiement, createPayPalOrder } from "../paiement/paiementSlice";
 import { mettreAJourCommande, obtenirCommandeParId } from "../commande/commandeSlice";
-import Header from "../../shared/header/Header";
 import Navbar from "../../shared/navbar/Navbar";
+import Footer from "../../shared/footer/Footer";
+import paypal from "../../assets/images/paypal.png";
+import visa from "../../assets/images/visa.png";
+import cb from "../../assets/images/cb.png";
 
 const Paiement = () => {
   const dispatch = useDispatch();
@@ -16,11 +19,7 @@ const Paiement = () => {
 console.log("État global des commandes dans Redux :", stateCommandes);
 
   const [moyenPaiement, setMoyenPaiement] = useState("carte");
-  const [coordonneesBancaires, setCoordonneesBancaires] = useState({
-    numeroCarte: "",
-    dateExpiration: "",
-    cvv: "",
-  });
+  const [paypalOrderId, setPaypalOrderId] = useState(null);
   const location = useLocation();
   const commandeId = location.state?.commandeId;
   const chargement = useSelector((state) => state.commandes?.chargement ?? false);
@@ -44,21 +43,17 @@ console.log("CommandeId récupérée dans Paiement.jsx :", commandeId);
     0
   );
 
-  const handlePaiement = () => {
-    if (!commande || !montantTotal) {
-        console.log("Aucune commande valide.");
-        return;
+  const handlePaiement = async () => {
+    try {
+        const orderId = await dispatch(createPayPalOrder(commande.id)).unwrap();
+        window.location.href = `https://www.sandbox.paypal.com/checkoutnow?token=${orderId}`;
+    } catch (error) {
+        console.error("Erreur lors de la création de la commande PayPal :", error);
+        alert("Une erreur est survenue lors de la création de la commande PayPal.");
     }
-
-    
-    navigate("/page-paiement", {
-        state: {
-            commandeId: commande.id, 
-            montantTotal: montantTotal, // Montant total
-            moyenPaiement: moyenPaiement, // Moyen de paiement choisi
-        },
-    });
 };
+
+
 
   if (chargement) {
     return <p>Chargement de la commande...</p>;
@@ -67,35 +62,67 @@ console.log("CommandeId récupérée dans Paiement.jsx :", commandeId);
   return (
     <>
     <Navbar/>
-    <div>
-      <h1>Paiement</h1>
-      {commande ? (
-        <div>
-          <h2>Récapitulatif de la commande</h2>
-          <ul>
-            {commande.itemsCommande.map((item) => (
-              <li key={item.id}>
-                {item.produitNom} - {item.quantite} x {item.produitPrix}€
-              </li>
-            ))}
-          </ul>
-          <h3>Montant total : {montantTotal}€</h3>
+    <div className="paiement-container">
+        <h1 className="paiement-title">Paiement</h1>
+        {commande ? (
+          <div className="paiement-recap">
+            <h2>Récapitulatif de la commande</h2>
+            <ul>
+              {commande.itemsCommande.map((item) => (
+                <li key={item.id}>
+                  {item.produitNom} - {item.quantite} x {item.produitPrix}€
+                </li>
+              ))}
+            </ul>
+            <h3 className="paiement-total">Montant total : {montantTotal}€</h3>
+            <div className="separator"></div>
+            <h2>Choisissez votre moyen de paiement</h2>
+            <div className="paiement-modes">
+  <button
+    className={`paiement-mode ${moyenPaiement === 'carte' ? 'active' : ''}`}
+    onClick={() => setMoyenPaiement('carte')}
+  >
+    <img
+      src={cb}
+      alt="Carte bancaire"
+      className="paiement-image"
+    />
+    <span>Carte bancaire</span>
+  </button>
+  <button
+    className={`paiement-mode ${moyenPaiement === 'visa' ? 'active' : ''}`}
+    onClick={() => setMoyenPaiement('visa')}
+  >
+    <img
+      src={visa}
+      alt="Visa"
+      className="paiement-image"
+    />
+    <span>Carte bancaire</span>
+  </button>
 
-          <h2>Choisissez votre moyen de paiement</h2>
-          <select
-            value={moyenPaiement}
-            onChange={(e) => setMoyenPaiement(e.target.value)}
-          >
-            <option value="carte">Carte bancaire</option>
-            <option value="paypal">PayPal</option>
-          </select>
+  <button
+    className={`paiement-mode ${moyenPaiement === 'paypal' ? 'active' : ''}`}
+    onClick={() => setMoyenPaiement('paypal')}
+  >
+    <img
+      src={paypal}
+      alt="PayPal"
+      className="paypal"
+    />
+    <span>PayPal</span>
+  </button>
+</div>
 
-          <button onClick={handlePaiement}>Confirmer le paiement</button>
-        </div>
-      ) : (
-        <p>Aucune commande en cours.</p>
-      )}
-    </div>
+            <button className="paiement-button" onClick={handlePaiement}>
+              Confirmer le paiement
+            </button>
+          </div>
+        ) : (
+          <p className="paiement-no-order">Aucune commande en cours.</p>
+        )}
+      </div>
+     <Footer/> 
     </>
   );
 };

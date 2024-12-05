@@ -1,41 +1,118 @@
-.page-paiement-container {
-    max-width: 600px;
-    margin: auto;
-    padding: 20px;
-    text-align: center;
-    background-color: #f9f9f9;
-    border-radius: 10px;
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  }
-  
-  .page-paiement-container h1 {
-    color: #4e6026;
-    margin-bottom: 20px;
-  }
-  
-  .page-paiement-container p {
-    margin: 10px 0;
-    font-size: 18px;
-  }
-  
-  .btn-valider {
-    background-color: #4e6026;
-    color: white;
-    padding: 10px 20px;
-    border: none;
-    border-radius: 5px;
-    font-size: 16px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-  }
-  
-  .btn-valider:hover {
-    background-color: #374719;
-  }
-  
-  .paiement-statut {
-    margin-top: 20px;
-    font-size: 18px;
-    font-weight: bold;
-  }
-  
+.paiement-container {
+  margin: 120px auto 100px auto;
+  padding: 20px;
+  max-width: 800px;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+}
+
+.paiement-title {
+  text-align: center;
+  color: #a52a2a;
+  font-size: 2rem;
+  font-weight: bold;
+  margin-bottom: 30px;
+}
+
+.paiement-recap h2 {
+  color: #4caf50;
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 25px;
+  text-align: center;
+}
+
+.paiement-recap ul {
+  list-style: none;
+  padding: 0;
+  margin: 0 0 1rem 0;
+}
+
+.paiement-recap li {
+  font-size: 1rem;
+  color: #333;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}
+
+
+.paiement-total {
+  text-align: center;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #000;
+  margin: 1rem 0;
+}
+
+.separator {
+  border: 0;
+  height: 1px;
+  background: #ccc;
+  margin: 20px 0; 
+}
+
+.paiement-select {
+  display: block;
+  width: 100%;
+  padding: 0.8rem;
+  font-size: 1rem;
+  color: #333;
+  border-radius: 8px;
+  margin: 1rem 0;
+}
+
+.paiement-modes {
+  display: flex;
+  justify-content: space-around;
+  margin: 30px 0;
+}
+
+.paiement-mode {
+  background-color: #fff;
+  border: 2px solid transparent;
+  border-radius: 8px;
+  padding: 10px;
+  text-align: center;
+  cursor: pointer;
+  margin-bottom: 20px;
+  transition: border-color 0.3s ease-in-out;
+}
+
+.paiement-mode.active {
+  border-color: #a52a2a;
+}
+
+.paiement-mode img {
+  height: 60px;
+  object-fit: contain;
+  margin-bottom: 10px;
+}
+.paypal {
+  width: 100px;
+}
+
+.paiement-mode span {
+  display: block;
+  font-size: 1rem;
+  color: #333;
+}
+
+.paiement-button {
+  display: block;
+  width: 300px;
+  margin: auto;
+  padding: 0.8rem;
+  font-size: 1.1rem;
+  font-weight: bold;
+  color: white;
+  background-color: #a52a2a;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  text-align: center;
+  transition: background-color 0.3s ease-in-out;
+}
+
+.paiement-button:hover {
+  background-color: #8b0000;
+}

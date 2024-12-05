@@ -45,18 +45,30 @@
 		<dependency>
 			<groupId>jakarta.validation</groupId>
 			<artifactId>jakarta.validation-api</artifactId>
-			<version>3.0.0</version> <!-- Ou la version la plus récente -->
+			<version>3.0.0</version>
 		</dependency>
 		<dependency>
 			<groupId>com.stripe</groupId>
 			<artifactId>stripe-java</artifactId>
-			<version>24.2.0</version> <!-- Vérifiez si une version plus récente est disponible -->
+			<version>24.2.0</version>
 		</dependency>
+		<dependency>
+			<groupId>com.paypal.sdk</groupId>
+			<artifactId>rest-api-sdk</artifactId>
+			<version>1.14.0</version>
+		</dependency>
+
+		<dependency>
+			<groupId>io.github.cdimascio</groupId>
+			<artifactId>java-dotenv</artifactId>
+			<version>5.2.2</version>
+		</dependency>
+
 
 		<dependency>
 			<groupId>org.hibernate.validator</groupId>
 			<artifactId>hibernate-validator</artifactId>
-			<version>6.2.0.Final</version> <!-- Ou la version la plus récente -->
+			<version>6.2.0.Final</version>
 		</dependency>
 		<dependency>
 			<groupId>org.glassfish</groupId>
@@ -119,7 +131,25 @@
 			<version>4.11.0</version>
 			<scope>test</scope>
 		</dependency>
+		<dependency>
+			<groupId>
+				com.paypal.sdk
+			</groupId>
+			<artifactId>
+				paypal-server-sdk
+			</artifactId>
+			<version>
+				0.6.0
+			</version>
+		</dependency>
 	</dependencies>
+	<repositories>
+		<repository>
+			<id>paypal-repo</id>
+			<url>https://oss.sonatype.org/content/repositories/releases</url>
+		</repository>
+	</repositories>
+
 
 	<build>
 		<plugins>
