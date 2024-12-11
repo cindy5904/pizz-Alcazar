@@ -112,11 +112,11 @@ const ProduitForm = () => {
 
     return (
         <>
-            <Header />
-            <Navbar />
+            
             <div className="product-form-container">
-                <h2 className='h2ProduitForm'>{id ? 'Modifier le produit' : 'Ajouter un produit'}</h2>
+            <div className="overlay">
                 <form className="product-form" onSubmit={handleSubmit}>
+                <h2 className='h2ProduitForm'>{id ? 'Modifier le produit' : 'Ajouter un produit'}</h2>
                     <div className="form-group">
                         <label>Nom:</label>
                         <input
@@ -146,7 +146,7 @@ const ProduitForm = () => {
                             required
                         />
                     </div>
-                    <div className="form-group">
+                    {/* <div className="form-group">
                         <label>Disponibilité:</label>
                         <input
                             type="checkbox"
@@ -154,7 +154,7 @@ const ProduitForm = () => {
                             checked={produit.disponibilite}
                             onChange={handleChange}
                         />
-                    </div>
+                    </div> */}
                     <div className="form-group">
                         <label>Catégorie:</label>
                         <select
@@ -195,6 +195,7 @@ const ProduitForm = () => {
                     </div>
                     <button className='buttonProduitForm' type="submit">{id ? 'Modifier' : 'Ajouter'}</button>
                 </form>
+                </div>
             </div>
         </>
     );

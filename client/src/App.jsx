@@ -1,13 +1,12 @@
 import { useEffect, useState } from 'react'
 import './App.css'
-import Navbar from './shared/navbar/Navbar';
 import { RouterProvider } from 'react-router-dom';
 import router from './route/app-routing'
 import { checkUser } from './componant/auth/authSlice';
 import { useDispatch, useSelector } from 'react-redux';
+import Navbar from './shared/navbar/Navbar';
 
 function App() {
-  console.log("App.js rendu");
     const dispatch = useDispatch();
     const user = useSelector((state) => state.auth.user);
 
@@ -24,7 +23,7 @@ function App() {
 
     return (
       <RouterProvider router={router}> {/* Placez le RouterProvider ici */}
-      <Navbar user={user} />
+      
       <button onClick={() => dispatch(checkUser())}>Vérifier l'utilisateur manuellement</button>
   </RouterProvider>
     );

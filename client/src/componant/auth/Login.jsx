@@ -35,7 +35,7 @@ const Login = () => {
 
   return (
     <>
-    <Navbar/>
+    
     
     <div className="loginPage">
   <div className="overlay">
@@ -77,7 +77,7 @@ const Login = () => {
 </div>
 
     
-    <Footer/>
+
     </>
   );
 };

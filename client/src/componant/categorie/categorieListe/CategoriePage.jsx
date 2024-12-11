@@ -67,12 +67,12 @@ console.log("Rôles de l'utilisateur dans CategoriePage :", roles);
 
   return (
     <>
-      <Navbar />
+    
       <div className="categories-page">
   <div className="categories-banner">
     <h1>Découvrez une sélection pour tous les goûts et toutes les envies !</h1>
     <img
-      src={homme} // Remplacez par l'image de votre personnage ou bannière
+      src={homme} 
       alt="Bienvenue"
       className="banner-image"
     />
@@ -127,7 +127,7 @@ console.log("Rôles de l'utilisateur dans CategoriePage :", roles);
   </ul>
 </div>
 
-      <Footer/>
+      
     </>
   );
 };

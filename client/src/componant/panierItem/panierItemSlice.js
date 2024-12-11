@@ -41,11 +41,13 @@ export const reduireQuantiteItem = createAsyncThunk(
 
 export const supprimerItem = createAsyncThunk(
   "panierItem/supprimerItem",
-  async ({ panierId, produitId }) => {
+  async ({ panierId, produitId }, { dispatch }) => {
     await PanierItemService.supprimerItem(panierId, produitId);
+    await dispatch(fetchPanierByUserId(panierId)); 
     return { panierId, produitId };
   }
 );
+
 
 const panierItemSlice = createSlice({
   name: "panierItem",

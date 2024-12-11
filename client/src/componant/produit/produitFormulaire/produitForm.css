@@ -1,13 +1,24 @@
-/* ProductForm.css */
-
 .product-form-container {
-    max-width: 600px;
-    margin: auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    position: relative;
+    width: 100vw;
+    height: 100vh;
+    background: url(../../../assets/images/imageFond.webp) no-repeat center center/cover; 
+    display: flex;
+    justify-content: center;
+    align-items: center;
 }
+
+.overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0, 0, 0, 0.6); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
 
 .h2ProduitForm {
     text-align: center;
@@ -17,9 +28,16 @@
 }
 
 .product-form {
-    display: flex;
-    flex-direction: column;
+    background-color: rgba(255, 255, 255, 0.9);
+    padding: 30px;
+    border-radius: 10px;
+    margin-top: 80px;
+    border: 2px solid #e7e6e6;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    width: 100%;
+    max-width: 600px;
 }
+
 
 .form-group {
     margin-bottom: 15px;
@@ -38,18 +56,16 @@ input, textarea, select {
     border-radius: 5px;
     font-size: 16px;
     width: 100%;
+    box-sizing: border-box;
 }
 
 textarea {
     resize: vertical;
 }
 
-input[type="checkbox"] {
-    width: auto;
-    margin-left: 5px;
-}
 
 .buttonProduitForm {
+    width: 150px;
     background-color: #c0392b;
     color: white;
     padding: 12px;
@@ -58,7 +74,8 @@ input[type="checkbox"] {
     cursor: pointer;
     font-size: 16px;
     transition: background-color 0.3s;
-    margin-top: 15px;
+    margin: 20px auto 10px auto;
+    display: block;
 }
 
 .buttonProduitForm:hover {

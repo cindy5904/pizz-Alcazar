@@ -42,9 +42,8 @@ const CategorieForm = ({ categorieActuelle, mode }) => {
 
     return (
         <>
-        <Header/>
-        <Navbar/>
-        <div>
+        
+        <div className='categorie-form'>
             <h2>{location.state && location.state.mode === 'modifier' ? 'Modifier la catégorie' : 'Créer une nouvelle catégorie'}</h2>
             <form onSubmit={handleSubmit}>
                 <div>

@@ -77,8 +77,6 @@ const Commandes = () => {
 
     return (
         <>
-        <Header/>
-        <Navbar/>
         <div className="commande-container">
         <h1>Liste des Commandes</h1>
 

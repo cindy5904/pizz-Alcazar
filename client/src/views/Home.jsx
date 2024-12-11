@@ -63,7 +63,7 @@ const Home = () => {
   return (
     <>
       <Header />
-      <Navbar/>
+     
       <div className="produitFar">
         <h1 className="title-far">Nos produits phares</h1>
         <div className="imgFar">
@@ -145,7 +145,7 @@ const Home = () => {
     </div>
   </div>
 </div>
-<Footer/>
+
 
 
 

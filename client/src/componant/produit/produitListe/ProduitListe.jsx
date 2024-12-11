@@ -63,7 +63,7 @@ const ProduitListe = () => {
 
   const handleEdit = (id) => {
     console.log(`Modifier le produit ${id}`);
-    navigate(`/produits/modifier/${id}`); // Redirige vers le formulaire de produit avec l'ID
+    navigate(`/produits/modifier/${id}`); 
 };
 
   const handleDelete = (produitId) => {
@@ -75,9 +75,23 @@ const ProduitListe = () => {
   return (
     <>
     
-        <Navbar />
+       
         <div className="produit-container">
             <h1 className="produit-titre">Nos Délicieuses Pizzas</h1>
+            {Array.isArray(roles) && roles.includes("ROLE_ADMIN") && (
+        <div className="admin-actions">
+          <button
+            className="btn btn-create"
+            
+            onClick={() => {
+              console.log("Navigation vers /produits/ajouter");
+              navigate("/produits/ajouter");
+            }}
+          >
+            Créer un produit
+          </button>
+        </div>
+      )}
             {chargement && <div className="loading-spinner">Chargement des produits...</div>}
             {erreur && <p className="produit-erreur">Erreur lors de la récupération des produits: {erreur}</p>}
 
@@ -114,7 +128,7 @@ const ProduitListe = () => {
                 )}
             </div>
         </div>
-        <Footer/>
+        
     </>
   );
 };

@@ -1,0 +1,92 @@
+/* Conteneur principal */
+.container-dashboard-admin {
+    display: grid;
+    grid-template-columns: 1fr 4fr; /* Menu latéral et contenu */
+    gap: 20px;
+    padding: 20px;
+    background-color: #f5f7fa;
+    min-height: 100vh;
+  }
+  
+  /* Menu latéral */
+  .sidebar-dashboard-admin {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .sidebar-dashboard-admin ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+  
+  .sidebar-dashboard-admin li {
+    margin: 15px 0;
+  }
+  
+  .sidebar-dashboard-admin li a {
+    text-decoration: none;
+    color: #333;
+    font-size: 1rem;
+    font-weight: bold;
+    transition: color 0.3s ease;
+  }
+  
+  .sidebar-dashboard-admin li a:hover {
+    color: #007bff;
+  }
+  
+  /* Contenu principal */
+  .main-dashboard-admin {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 20px;
+  }
+  
+  /* Cartes */
+  .card-dashboard-admin {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+  }
+  
+  .card-dashboard-admin h2 {
+    font-size: 1.2rem;
+    color: #333;
+    margin-bottom: 15px;
+    border-bottom: 2px solid #007bff;
+    display: inline-block;
+    padding-bottom: 5px;
+  }
+  
+  .card-dashboard-admin p {
+    font-size: 1rem;
+    color: #666;
+  }
+  
+  .card-dashboard-admin .chart {
+    height: 150px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  
+  /* Header */
+  .header-dashboard-admin {
+    grid-column: span 2;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+    padding: 20px;
+    font-size: 1.5rem;
+    font-weight: bold;
+  }
+  

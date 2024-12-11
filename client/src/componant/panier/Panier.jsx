@@ -6,11 +6,9 @@ import {
   supprimerItem, ajouterQuantiteItem
 } from "../panierItem/panierItemSlice";
 import { creerCommande } from "../commande/commandeSlice";
-import Header from "../../shared/header/Header";
-import Navbar from "../../shared/navbar/Navbar";
-import { useLocation, useNavigate } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import "./panier.css";
-import Footer from "../../shared/footer/Footer";
+import trash from "../../assets/images/trash.png";
 
 const Panier = () => {
   const dispatch = useDispatch();
@@ -34,7 +32,10 @@ const Panier = () => {
   }, [dispatch, userId]);
 
   const handleDeleteItem = (produitId) => {
-    dispatch(supprimerPanier({ panierId: panier.id, produitId }));
+    console.log("Panier ID :", panier.id);
+    console.log("Produit ID :", produitId);
+    dispatch(supprimerItem({ panierId: panier.id, produitId })).then(() =>
+       dispatch(fetchPanierByUserId(userId, produitId))); 
   };
 
   const handleReduceQuantity = (produitId, quantiteActuelle) => {
@@ -94,6 +95,37 @@ const calculateTotal = () => {
     return total + item.produit.prix * item.quantite;
   }, 0);
 };
+const calculateTotalHT = () => {
+  if (!panier || !panier.itemsPanier) return 0;
+
+  return panier.itemsPanier.reduce((totalHT, item) => {
+    const tauxTVA = item.produit.tauxTVA || 0.2; 
+    const prixHT = item.produit.prix / (1 + tauxTVA); 
+    return totalHT + prixHT * item.quantite;
+  }, 0);
+};
+
+const calculateTVA = () => {
+  if (!panier || !panier.itemsPanier) return 0;
+
+  return panier.itemsPanier.reduce((totalTVA, item) => {
+    const tauxTVA = item.produit.tauxTVA || 0.2; 
+    const montantTVA = item.produit.prix * (tauxTVA / (1 + tauxTVA)); 
+    return totalTVA + montantTVA * item.quantite;
+  }, 0);
+};
+
+const calculateTotalTTC = () => {
+  if (!panier || !panier.itemsPanier) return 0;
+
+  return panier.itemsPanier.reduce((total, item) => {
+    return total + item.produit.prix * item.quantite;
+  }, 0);
+};
+const calculateFidelityPoints = () => {
+  const total = calculateTotal();
+  return Math.floor(total); 
+};
 const handleIncreaseQuantity = (panierId, produitId) => {
   dispatch(
     ajouterQuantiteItem({
@@ -108,61 +140,79 @@ const handleIncreaseQuantity = (panierId, produitId) => {
 
   return (
     <>
-      
-      <Navbar />
+   <div className="panier-container">
+  <Link to="/categories" className="continue-shopping">
+    &larr; <strong>Continuer mes achats</strong>
+  </Link>
 
-      <div className="panier-container">
   <h1 className="panier-title">Mon Panier</h1>
+
   {panier && panier.itemsPanier && panier.itemsPanier.length > 0 ? (
     <div className="panier-items">
       {panier.itemsPanier.map((item) => (
-       <div className="panier-item" key={item.id}>
-       <div className="panier-item-details">
-         <h2 className="panier-item-title">{item.produit.nom}</h2>
-       </div>
-       <div className="panier-item-actions">
-         <button
-           className="btn-symbol"
-           onClick={() => handleReduceQuantity(item.produit.id, item.quantite)}
-         >
-           -
-         </button>
-         <span className="quantity-display">{item.quantite}</span>
-         <button
-    className="btn-symbol"
-    onClick={() => handleIncreaseQuantity(panier.id, item.produit.id)}
-  >
-    +
-  </button>
+        <div className="panier-item" key={item.id}>
+          <div className="panier-item-header">
+          <div className="panier-item-title-container">
+    <h2 className="panier-item-title">{item.produit.nom}</h2>
+  </div>
+            
 
-         <button
-           className="btn-symbol btn-delete"
-           onClick={() => handleDeleteItem(item.produit.id)}
-         >
-           X
-         </button>
-       </div>
-     
-       {/* Nom du Produit */}
-       
-     
-       {/* Prix */}
-       <p className="panier-item-price">{item.produit.prix}€</p>
-     </div>
-     
+            <div className="panier-item-actions">
+              <button className="btn-symbol" onClick={() => handleReduceQuantity(item.produit.id, item.quantite)}>-</button>
+              <span className="quantity-display">{item.quantite}</span>
+              <button className="btn-symbol" onClick={() => handleIncreaseQuantity(panier.id, item.produit.id)}>+</button>
+            </div>
+            <div className="section-gauche-item">
+            <p className="panier-item-price">{(item.produit.prix * item.quantite).toFixed(2)}€</p>
+            <button className="btn-trash" onClick={() => handleDeleteItem(item.produit.id)}>
+  <img src={trash} alt="poubelle de suppression article" className="trash" />
+</button>
+
+            </div>
+           
+            <details className="panier-item-details">
+              <summary className="panier-item-summary">Description</summary>
+              <hr className="panier-item-separator" />
+              <p className="panier-item-description">
+                {item.produit.description || "Aucune description disponible."}
+              </p>
+              <button className="btn-modifier" onClick={() => navigate("/categories")}>Modifier</button>
+            </details>
+          </div>
+        </div>
       ))}
     </div>
   ) : (
     <p className="panier-empty">Votre panier est vide.</p>
   )}
-  <div className="panier-summary">
-    <h2>Total : {calculateTotal().toFixed(2)}€</h2>
-    <button className="btn-proceed" onClick={handleProceedToPayment}>
-      Procéder à la commande
-    </button>
-  </div>
+  <div className="fidelity-points-container">
+  <p className="fidelity-points">
+    Avec cette commande, vous allez gagner <strong>{calculateFidelityPoints()}</strong> points de fidélité !<span className="icon-crown">✨</span>
+  </p>
 </div>
-      <Footer/>
+<div className="panier-summary">
+  <div className="panier-summary-item">
+    <span className="panier-summary-label">Total HT</span>
+    <span className="panier-summary-value">{calculateTotalHT().toFixed(2)}€</span>
+  </div>
+  <div className="panier-summary-item">
+    <span className="panier-summary-label">Montant TVA</span>
+    <span className="panier-summary-value">{calculateTVA().toFixed(2)}€</span>
+  </div>
+  <hr className="panier-summary-separator" />
+  <div className="panier-summary-total">
+    <span className="panier-summary-total-label">Total</span>
+    <span className="panier-summary-total-value">{calculateTotalTTC().toFixed(2)}€</span>
+  </div>
+  
+  <button className="btn-proceed" onClick={handleProceedToPayment}>
+    Valider mon panier
+  </button>
+</div>
+
+</div>
+
+ 
     </>
   );
 };

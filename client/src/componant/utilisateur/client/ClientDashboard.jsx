@@ -19,8 +19,6 @@ const ClientDashboard = () => {
 
   return (
     <>
-    <Header/>
-    <Navbar/>
     <div className="client-dashboard">
       <h1>Bonjour, {user.prenom} {user.nom} 👋</h1>
 

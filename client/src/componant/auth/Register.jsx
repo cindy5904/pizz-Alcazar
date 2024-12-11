@@ -35,7 +35,7 @@ const Register = () => {
 
   return (
     <>
-      <Navbar />
+      
       <div className="registerPage">
         <div className="overlay">
           <div className="register-container">
@@ -107,7 +107,7 @@ const Register = () => {
           </div>
         </div>
       </div>
-      <Footer />
+      
     </>
   );
 };

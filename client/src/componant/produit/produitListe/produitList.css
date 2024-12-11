@@ -2,13 +2,12 @@
     max-width: 1200px;
     margin: auto;
     padding-top: 100px;
-    background-color: #f9f3e5; /* Arrière-plan doux */
     border-radius: 10px;
 }
 
 .produit-titre {
     text-align: center;
-    color: #b34700; /* Ton chaud pour rappeler le bois et le four */
+    color: #b34700; 
     font-size: 2.5rem;
     margin-bottom: 30px;
 }

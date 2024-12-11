@@ -19,8 +19,8 @@
 }
 
 .logo img {
-  height: 50px; /* Ajuste la taille du logo */
-  width: auto; /* Garde les proportions */
+  height: auto;
+  width: 80px; /* Garde les proportions */
   cursor: pointer; /* Change le curseur pour indiquer que c'est cliquable */
 }
 

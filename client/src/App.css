@@ -1,2 +1,24 @@
 @import "slick-carousel/slick/slick.css";
 @import "slick-carousel/slick/slick-theme.css";
+/* Conteneur principal qui englobe toute la page */
+.body-container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh; /* Hauteur minimale = hauteur de la fenêtre */
+  }
+  
+  /* La zone principale doit s'étendre pour pousser le footer vers le bas */
+  .main-content {
+    flex: 1; /* Prend tout l'espace disponible */
+  }
+  
+  /* Footer reste en bas */
+  footer {
+    background-color: #121212;
+    color: #fff;
+    text-align: center;
+    padding: 20px;
+  }
+  
+
+  

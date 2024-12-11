@@ -6,6 +6,7 @@ import panierReducer from "../componant/panier/panierSlice";
 import panierItemReducer from "../componant/panierItem/panierItemSlice";
 import commandeSliceReducer from "../componant/commande/commandeSlice";
 import paiementReducer from "../componant/paiement/paiementSlice";
+import historiqueFideliteReducer from "../componant/historiqueFidelite/historiqueFideliteSlice";
 
 const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ const store = configureStore({
     panierItem: panierItemReducer,
     commandes : commandeSliceReducer,
     paiement : paiementReducer,
+    historiqueFidelite: historiqueFideliteReducer,
   },
 });
 

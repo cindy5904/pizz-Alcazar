@@ -1,5 +1,6 @@
 import { createBrowserRouter } from "react-router-dom";
 import Home from '../views/Home';
+import CarteView from "../views/carte/CarteView";
 import Login from '../componant/auth/Login';
 import Register from "../componant/auth/Register";
 import ProduitForm from '../componant/produit/produitFormulaire/ProduitForm';
@@ -12,11 +13,30 @@ import Commandes from "../componant/commande/Commande";
 import PagePaiement from "../componant/paiement/PagePaiement";
 import ClientDashboard from "../componant/utilisateur/client/ClientDashboard";
 import InfoModifClient from "../componant/utilisateur/client/edit/InfoModifClient";
+import { PayPalScriptProvider } from "@paypal/react-paypal-js";
+import Success from "../componant/paiement/success/Success";
+import Layout from "../shared/Layout";
+import DashboardAdmin from "../componant/utilisateur/admin/DashBoardAdmin";
+import ProtectedRoute from "../componant/route/ProtectedRoute";
+
+
+const initialPayPalOptions = {
+    "client-id": import.meta.env.VITE_PAYPAL_CLIENT_ID,
+    currency: "EUR",
+};
 
 const router = createBrowserRouter([
     {
+        path: "/",
+        element: <Layout />, 
+        children: [
+    {
         path :"/",
         element : <Home />,
+    },
+    {
+        path : "/consulter-la-carte",
+        element : <CarteView />,
     },
     {
         path :"/login",
@@ -28,26 +48,12 @@ const router = createBrowserRouter([
         element : <Register />,
 
     },
-    {
-        path: "/produits/ajouter",
-        element: <ProduitForm />, 
-    },
-    {
-        path: "/produits/modifier/:id", 
-        element: <ProduitForm />, 
-    },
-    {
-        path: "/produits/modifier/:id",
-        element: <ProduitForm />, 
-    },
+
     {
         path: "/produits",
         element: <ProduitListe />, 
     },
-    {
-        path: "/formcategorie",
-        element: <CategorieForm />, 
-    },
+   
     {
         path: "/categories",
         element: <CategoriesPage />, 
@@ -59,7 +65,11 @@ const router = createBrowserRouter([
     }, 
     {
         path: "/paiement",
-        element: <Paiement />, 
+        element: (
+            <PayPalScriptProvider options={initialPayPalOptions}>
+                <Paiement />
+            </PayPalScriptProvider>
+        ),
     }, 
     {
         path: "/commande",
@@ -77,10 +87,25 @@ const router = createBrowserRouter([
         path: "/mon-compte/modifier", 
         element: <InfoModifClient />,
     },
-
-
-
+    {
+        path: "/success", 
+        element: <Success />,
+    },
     
+    {
+        path: "", // Ajoute un chemin vide ici
+        element: <ProtectedRoute allowedRoles={['ROLE_ADMIN']} />,
+        children: [
+          { path: "/produits/ajouter", element: <ProduitForm /> },
+          { path: "/produits/modifier/:id", element: <ProduitForm /> },
+          { path: "/formcategorie", element: <CategorieForm /> },
+          { path: "/admin", element: <DashboardAdmin /> },
+        ],
+      },
+
+
+
+        ]}    
     
     
 

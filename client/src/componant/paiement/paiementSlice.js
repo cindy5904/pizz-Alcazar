@@ -42,13 +42,26 @@ export const createPayPalOrder = createAsyncThunk(
     'paiements/createPayPalOrder',
     async (commandeId, { rejectWithValue }) => {
         try {
-            const response = await PaiementService.createPayPalOrder(commandeId);
-            return response; // Order ID PayPal
+            const approvalLink = await PaiementService.createPayPalOrder(commandeId);
+            
+            // Debug log
+            console.log("Lien d'approbation reçu :", approvalLink);
+
+            if (approvalLink) {
+                console.log("Redirection vers :", approvalLink);
+                window.location.href = approvalLink; // Redirection
+            } else {
+                throw new Error("Lien d'approbation introuvable.");
+            }
         } catch (error) {
-            return rejectWithValue(error.response.data);
+            console.error("Erreur lors de la création de la commande :", error);
+            return rejectWithValue(error.response?.data || error.message);
         }
     }
 );
+
+
+
 
 // 2. Capture d'une commande PayPal
 export const capturePayPalOrder = createAsyncThunk(
