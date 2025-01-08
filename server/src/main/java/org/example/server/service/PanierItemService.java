@@ -97,11 +97,6 @@ public class PanierItemService {
     }
 
 
-
-
-
-
-
     public void supprimerItem(Long produitId, Long panierId) {
         PanierItem panierItem = panierItemRepository.findByProduitIdAndPanierId(produitId, panierId);
         if (panierItem != null) {

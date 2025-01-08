@@ -70,7 +70,18 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.DELETE, "/api/produits/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.POST, "/api/categories/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/paiements/commandes-payees").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/historique-fidelite/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/historique-fidelite/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/historique-fidelite/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.DELETE, "/api/historique-fidelite/**").hasRole("ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/categories/**").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/recompenses").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/commandes/par-semaine").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.PUT, "/api/commandes/*/statut").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.GET, "/api/commandes/commandes-payees-et-en-cours").hasRole("ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/recompenses/generer/**").hasAnyRole("ADMIN", "CLIENT")
+                        .requestMatchers(HttpMethod.GET, "/api/recompenses/historique/**").hasAnyRole("ADMIN", "CLIENT")
                         .requestMatchers(HttpMethod.POST, "/api/panier/**").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers(HttpMethod.PUT, "/api/panier/**").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/panier/**").hasAnyRole("CLIENT", "ADMIN")
@@ -88,6 +99,9 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.PUT, "/api/paiements/**").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers(HttpMethod.DELETE, "/api/paiements/**").hasAnyRole("CLIENT", "ADMIN")
                         .requestMatchers(HttpMethod.GET, "/api/paiements/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/paiements/paypal/create-order/**").hasAnyRole("CLIENT", "ADMIN")
+                        .requestMatchers(HttpMethod.POST, "/api/paiements/paypal/capture-order/**").hasAnyRole("CLIENT", "ADMIN")
+
 
                         .anyRequest().authenticated()
 

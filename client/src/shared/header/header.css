@@ -3,7 +3,7 @@
   height: 100vh;
   background: url('../../assets/images/imageFond.webp') center/cover no-repeat;
   display: flex;
-  align-items: center; /* Centre verticalement */
+  align-items: center; 
   color: white;
 }
 

@@ -1,29 +1,34 @@
 package org.example.server;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.server.dto.commande.CommandeDtoGet;
 import org.example.server.dto.commande.CommandeDtoPost;
+import org.example.server.dto.commandeItem.CommandeItemDtoGet;
+import org.example.server.dto.commandeItem.CommandeItemDtoPost;
 import org.example.server.entity.*;
 import org.example.server.enums.EtatCommande;
 import org.example.server.exception.ResourceNotFoundException;
-import org.example.server.repository.CommandeRepository;
-import org.example.server.repository.PaiementRepository;
-import org.example.server.repository.PanierRepository;
-import org.example.server.repository.UtilisateurRepository;
+import org.example.server.repository.*;
+import org.example.server.service.CommandeItemService;
 import org.example.server.service.CommandeService;
 import org.junit.Before;
 import org.junit.Test;
+import org.junit.jupiter.api.Assertions;
 import org.junit.runner.RunWith;
 import org.mockito.*;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -33,271 +38,216 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
+@SpringBootTest
 @Import(TestSecurityConfig.class)
 public class CommandeServiceTest {
     @InjectMocks
-    private CommandeService commandeService;
+    private CommandeItemService commandeItemService;
+
+    @Mock
+    private CommandeItemRepository commandeItemRepository;
+    @Mock
+    private PaiementRepository paiementRepository;
 
     @Mock
     private CommandeRepository commandeRepository;
 
     @Mock
-    private UtilisateurRepository utilisateurRepository;
+    private ProduitRepository produitRepository;
 
-    @Mock
-    private PanierRepository panierRepository;
-
-    @Mock
-    private PaiementRepository paiementRepository;
-
-    private CommandeDtoPost commandeDto;
     private Commande commande;
-    private Utilisateur utilisateur;
+    private Produit produit;
+    private CommandeItem commandeItem;
+    private CommandeItemDtoPost commandeItemDtoPost;
 
     @Before
     public void setUp() {
         MockitoAnnotations.openMocks(this);
-        // Initialisation des objets de test
-        commandeDto = new CommandeDtoPost();
-        commandeDto.setDetailsCommande("Pizza Margherita");
-        commandeDto.setStatut(EtatCommande.valueOf("EN_COURS"));
-        commandeDto.setUserId(1L);
-        commandeDto.setAdresseLivraison("123 Rue Exemple");
-        commandeDto.setTelephone("0123456789");
 
-        utilisateur = new Utilisateur();
-        utilisateur.setId(1L);
-        utilisateur.setPointsFidelite(50); // Points d'exemple
+        // Initialisation du produit
+        produit = new Produit();
+        produit.setId(1L);
+        produit.setNom("Produit Test");
+        produit.setPrix(50.0);
 
+        // Initialisation de la commande
         commande = new Commande();
         commande.setId(1L);
-        commande.setDetailsCommande("Pizza Margherita");
-        commande.setStatut(EtatCommande.EN_COURS);
-        commande.setUser(utilisateur);
+        commande.setDetailsCommande("Détails de la commande");
+
+        // Initialisation du CommandeItem
+        commandeItem = new CommandeItem();
+        commandeItem.setId(1L);
+        commandeItem.setQuantite(2);
+        commandeItem.setProduit(produit);
+        commandeItem.setCommande(commande);
+
+        // Initialisation du CommandeItemDtoPost
+        commandeItemDtoPost = new CommandeItemDtoPost();
+        commandeItemDtoPost.setProduitId(1L);
+        commandeItemDtoPost.setCommandeId(1L);
+        commandeItemDtoPost.setQuantite(2);
     }
 
     @Test
-    public void creerCommande_ShouldReturnCommandeDtoGet() {
+    public void testCreateCommandeItem_Success() {
         // Arrange
-        Long panierId = 1L;
-        Panier panier = new Panier();
-        panier.setId(panierId);
-
-        // Mock le comportement du panierRepository
-        when(panierRepository.findById(panierId)).thenReturn(Optional.of(panier));
-
-        CommandeDtoPost commandeDto = new CommandeDtoPost();
-        commandeDto.setDetailsCommande("Détails de la commande");
-        commandeDto.setStatut(EtatCommande.EN_COURS); // Utilisez directement l'énumération ici
-        commandeDto.setUserId(1L);
-        commandeDto.setTypeLivraison("LIVRAISON");
-        commandeDto.setAdresseLivraison("123 Rue Exemple");
-        commandeDto.setTelephone("0123456789");
-        commandeDto.setPanierId(panierId); // Ajoutez l'ID du panier ici
-
-        // Mock le comportement du utilisateurRepository si nécessaire
-        Utilisateur utilisateur = new Utilisateur();
-        utilisateur.setId(1L);
-        when(utilisateurRepository.findById(1L)).thenReturn(Optional.of(utilisateur));
-
-        // Mock le comportement du commandeRepository
-        Commande savedCommande = new Commande();
-        savedCommande.setId(1L);
-        savedCommande.setDetailsCommande("Détails de la commande");
-        savedCommande.setStatut(EtatCommande.EN_COURS);
-        savedCommande.setUser(utilisateur);
-        savedCommande.setPanier(panier);
-        savedCommande.setAdresseLivraison("123 Rue Exemple");
-        savedCommande.setTelephone("0123456789");
-
-        when(commandeRepository.save(any())).thenReturn(savedCommande);
-
-        // Act
-        CommandeDtoGet commandeDtoGet = commandeService.createCommande(commandeDto);
-
-        // Assert
-        assertNotNull(commandeDtoGet);
-        assertEquals(1L, commandeDtoGet.getId().longValue());
-        assertEquals("Détails de la commande", commandeDtoGet.getDetailsCommande());
-        verify(commandeRepository, times(1)).save(any(Commande.class));
-    }
-
-
-
-
-
-    @Test
-    public void recupererCommandeParId_ShouldReturnCommandeDtoGet() {
-        // Arrange
+        when(produitRepository.existsById(1L)).thenReturn(true);
+        when(produitRepository.findById(1L)).thenReturn(Optional.of(produit));
         when(commandeRepository.findById(1L)).thenReturn(Optional.of(commande));
+        when(commandeItemRepository.save(any(CommandeItem.class))).thenReturn(commandeItem);
 
         // Act
-        CommandeDtoGet resultat = commandeService.getCommandeById(1L);
+        CommandeItemDtoGet result = commandeItemService.createCommandeItem(commandeItemDtoPost);
 
         // Assert
-        assertNotNull(resultat);
-        assertEquals(commande.getId(), resultat.getId());
-        verify(commandeRepository, times(1)).findById(1L);
+        assertNotNull(result);
+        assertEquals(1L, result.getProduitId().longValue());
+        assertEquals(2, result.getQuantite());
+        verify(commandeItemRepository, times(1)).save(any(CommandeItem.class));
     }
 
-
-
-    @Test
-    public void validerCommande_ShouldUpdatePointsFidelite() {
-        Long commandeId = 1L;
-
-        Utilisateur utilisateur = new Utilisateur();
-        utilisateur.setId(1L);
-        utilisateur.setPointsFidelite(30);
-
-        Commande commande = new Commande();
-        commande.setId(commandeId);
-        List<CommandeItem> itemsCommande = new ArrayList<>();
-
-        Produit produit = new Produit();
-        produit.setPrix(100.0);
-
-        CommandeItem item = new CommandeItem();
-        item.setProduit(produit);
-        item.setQuantite(1);
-        itemsCommande.add(item);
-        commande.setItemsCommande(itemsCommande);
-        commande.setUser(utilisateur);
-
-        when(commandeRepository.findById(commandeId)).thenReturn(Optional.of(commande));
-
-        // Mock utilisateurRepository to simulate saving and updating the points correctly
-        doAnswer(invocation -> {
-            Utilisateur savedUser = invocation.getArgument(0);
-            savedUser.setPointsFidelite(130); // Directly set the updated points for testing
-            return savedUser;
-        }).when(utilisateurRepository).save(any(Utilisateur.class));
-
-        commandeService.validerCommande(commandeId);
-
-        // Verify the points after method execution
-        ArgumentCaptor<Utilisateur> utilisateurCaptor = ArgumentCaptor.forClass(Utilisateur.class);
-        verify(utilisateurRepository).save(utilisateurCaptor.capture());
-        Utilisateur utilisateurSauvegarde = utilisateurCaptor.getValue();
-
-        System.out.println("Points de fidélité après validation: " + utilisateurSauvegarde.getPointsFidelite());
-        assertEquals(130, utilisateurSauvegarde.getPointsFidelite());
-    }
-
-    @Test
-    public void validerCommande_ShouldApplyDiscountAutomaticallyWhenPointsExceed100() {
-        Long commandeId = 1L;
-
-        // Créer un utilisateur avec 90 points de fidélité
-        Utilisateur utilisateur = new Utilisateur();
-        utilisateur.setId(1L);
-        utilisateur.setPointsFidelite(90);
-
-        // Créer une commande avec un produit de 20€
-        Commande commande = new Commande();
-        commande.setId(commandeId);
-        List<CommandeItem> itemsCommande = new ArrayList<>();
-
-        Produit produit = new Produit();
-        produit.setPrix(20.0);
-
-        CommandeItem item = new CommandeItem();
-        item.setProduit(produit);
-        item.setQuantite(1);
-        itemsCommande.add(item);
-        commande.setItemsCommande(itemsCommande);
-        commande.setUser(utilisateur);
-
-        when(commandeRepository.findById(commandeId)).thenReturn(Optional.of(commande));
-
-        // Exécuter la méthode
-        commandeService.validerCommande(commandeId);
-
-        // Vérifier que l'utilisateur a reçu une remise et que les points ont été mis à jour
-        ArgumentCaptor<Utilisateur> utilisateurCaptor = ArgumentCaptor.forClass(Utilisateur.class);
-        verify(utilisateurRepository).save(utilisateurCaptor.capture());
-        Utilisateur utilisateurSauvegarde = utilisateurCaptor.getValue();
-
-        // Après validation, il doit rester 10 points après application de la remise
-        assertEquals(10, utilisateurSauvegarde.getPointsFidelite());
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-    @Test
-    public void supprimerCommande_ShouldDeleteCommande() {
+    @Test(expected = ResourceNotFoundException.class)
+    public void testCreateCommandeItem_ProduitNotFound() {
         // Arrange
-        when(commandeRepository.existsById(1L)).thenReturn(true);
+        when(produitRepository.existsById(1L)).thenReturn(false);
 
         // Act
-        commandeService.deleteCommande(1L);
+        commandeItemService.createCommandeItem(commandeItemDtoPost);
+    }
 
-        // Assert
-        verify(commandeRepository, times(1)).deleteById(1L);
+    @Test(expected = ResourceNotFoundException.class)
+    public void testCreateCommandeItem_CommandeNotFound() {
+        // Arrange
+        when(produitRepository.existsById(1L)).thenReturn(true);
+        when(commandeRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // Act
+        commandeItemService.createCommandeItem(commandeItemDtoPost);
     }
 
     @Test
-    public void recupererToutesLesCommandesParUtilisateur_ShouldReturnListOfCommandes() {
+    public void testUpdateCommandeItem_Success() {
         // Arrange
-        Long userId = 1L; // ID de l'utilisateur pour le test
-        Pageable pageable = PageRequest.of(0, 10); // Pagination pour le test
-        Commande commande = new Commande();
-        commande.setDetailsCommande("Pizza Margherita");
-        commande.setUser(new Utilisateur(userId)); // Associer la commande à l'utilisateur
-
-        Page<Commande> commandesPage = new PageImpl<>(List.of(commande)); // Simuler une page contenant une commande
-        when(commandeRepository.findByUserId(userId, pageable)).thenReturn(commandesPage);
+        when(commandeItemRepository.findById(1L)).thenReturn(Optional.of(commandeItem));
+        when(produitRepository.existsById(1L)).thenReturn(true);
+        when(produitRepository.findById(1L)).thenReturn(Optional.of(produit));
+        when(commandeItemRepository.save(any(CommandeItem.class))).thenReturn(commandeItem);
 
         // Act
-        List<CommandeDtoGet> resultat = commandeService.getAllCommandes(userId, pageable);
+        CommandeItemDtoGet result = commandeItemService.updateCommandeItem(1L, commandeItemDtoPost);
 
         // Assert
-        assertEquals(1, resultat.size());
-        assertEquals("Pizza Margherita", resultat.get(0).getDetailsCommande());
-        assertEquals(userId, resultat.get(0).getUserId());
+        assertNotNull(result);
+        assertEquals(2, result.getQuantite());
+        verify(commandeItemRepository, times(1)).save(any(CommandeItem.class));
     }
 
-
-    @Test
-    public void mettreAJourCommande_ShouldReturnUpdatedCommandeDtoGet() {
+    @Test(expected = ResourceNotFoundException.class)
+    public void testUpdateCommandeItem_NotFound() {
         // Arrange
-        commandeDto.setDetailsCommande("Pizza Pepperoni");
-        when(commandeRepository.findById(1L)).thenReturn(Optional.of(commande));
-        when(commandeRepository.save(any(Commande.class))).thenReturn(commande);
+        when(commandeItemRepository.findById(1L)).thenReturn(Optional.empty());
 
         // Act
-        CommandeDtoGet resultat = commandeService.updateCommande(1L, commandeDto);
-
-        // Assert
-        assertNotNull(resultat);
-        assertEquals("Pizza Pepperoni", resultat.getDetailsCommande());
-        verify(commandeRepository, times(1)).save(any(Commande.class));
+        commandeItemService.updateCommandeItem(1L, commandeItemDtoPost);
     }
 
     @Test
-    public void recupererCommandeAvecPaiementParId_ShouldReturnCommandeDtoGet() {
+    public void testGetCommandeItemById_Success() {
         // Arrange
-        when(commandeRepository.findCommandeWithPaiementById(1L)).thenReturn(Optional.of(commande));
+        when(commandeItemRepository.findById(1L)).thenReturn(Optional.of(commandeItem));
 
         // Act
-        CommandeDtoGet resultat = commandeService.getCommandeWithPaiementsById(1L);
+        CommandeItemDtoGet result = commandeItemService.getCommandeItemById(1L);
 
         // Assert
-        assertNotNull(resultat);
-        verify(commandeRepository, times(1)).findCommandeWithPaiementById(1L);
+        assertNotNull(result);
+        assertEquals(1L, result.getProduitId().longValue());
+        verify(commandeItemRepository, times(1)).findById(1L);
     }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void testGetCommandeItemById_NotFound() {
+        // Arrange
+        when(commandeItemRepository.findById(1L)).thenReturn(Optional.empty());
+
+        // Act
+        commandeItemService.getCommandeItemById(1L);
+    }
+
+    @Test
+    public void testDeleteCommandeItem_Success() {
+        // Arrange
+        when(commandeItemRepository.existsById(1L)).thenReturn(true);
+
+        // Act
+        commandeItemService.deleteCommandeItem(1L);
+
+        // Assert
+        verify(commandeItemRepository, times(1)).deleteById(1L);
+    }
+
+    @Test(expected = ResourceNotFoundException.class)
+    public void testDeleteCommandeItem_NotFound() {
+        // Arrange
+        when(commandeItemRepository.existsById(1L)).thenReturn(false);
+
+        // Act
+        commandeItemService.deleteCommandeItem(1L);
+    }
+
+    @Test
+    public void testGetItemsByCommandeId_Success() {
+        // Arrange
+        List<CommandeItem> items = Arrays.asList(commandeItem);
+        when(commandeItemRepository.findByCommandeId(1L)).thenReturn(items);
+
+        // Act
+        List<CommandeItemDtoGet> result = commandeItemService.getItemsByCommandeId(1L);
+
+        // Assert
+        assertNotNull(result);
+        assertEquals(1, result.size());
+        verify(commandeItemRepository, times(1)).findByCommandeId(1L);
+    }
+    @Test
+    public void testFindCommandesByDatePaiementBetween() {
+        LocalDateTime startDate = LocalDateTime.of(2025, 1, 1, 0, 0);
+        LocalDateTime endDate = LocalDateTime.of(2025, 1, 7, 23, 59);
+
+        List<Commande> commandes = commandeRepository.findCommandesByDatePaiementBetween(startDate, endDate);
+
+        System.out.println("Commandes trouvées : " + commandes.size());
+        commandes.forEach(c -> System.out.println("Commande ID : " + c.getId()));
+    }
+    @Test
+    public void testFindCommandesByPaiementDate() {
+        // Arrange
+        LocalDateTime startDate = LocalDateTime.of(2025, 1, 5, 0, 0);
+
+        Commande commande1 = new Commande();
+        commande1.setId(79L);
+        commande1.setDetailsCommande("Commande de Test");
+        commande1.setStatut(EtatCommande.valueOf("EN_COURS"));
+
+        Paiement paiement1 = new Paiement();
+        paiement1.setId(32L);
+        paiement1.setDatePaiement(LocalDateTime.of(2025, 1, 6, 15, 0));
+        paiement1.setCommande(commande1);
+
+        List<Commande> expectedCommandes = List.of(commande1);
+
+        Mockito.when(paiementRepository.findCommandesByPaiementDate(startDate))
+                .thenReturn(expectedCommandes);
+
+        // Act
+        List<Commande> commandes = paiementRepository.findCommandesByPaiementDate(startDate);
+
+        // Assert
+        Assertions.assertFalse(commandes.isEmpty(), "Commandes trouvées : " + commandes.size());
+        Assertions.assertEquals(1, commandes.size());
+        Assertions.assertEquals("Commande de Test", commandes.get(0).getDetailsCommande());
+    }
+
 }
+

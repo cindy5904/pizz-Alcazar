@@ -18,6 +18,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import java.util.List;
@@ -29,6 +30,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
+@SpringBootTest
 @Import(TestSecurityConfig.class)
 public class CommandeItemServiceTest {
     @InjectMocks
@@ -50,7 +52,7 @@ public class CommandeItemServiceTest {
         MockitoAnnotations.openMocks(this);
 
         commande = new Commande();
-        commande.setId(1L); // Assurez-vous que l'ID est défini
+        commande.setId(1L);
 
         produit = new Produit();
         produit.setId(1L); // Assurez-vous que l'ID est défini

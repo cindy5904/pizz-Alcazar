@@ -39,7 +39,6 @@ h2 {
   margin-bottom: 20px;
 }
 
-/* Formulaire */
 .register-form {
   display: flex;
   flex-direction: column;
@@ -69,7 +68,6 @@ input:focus {
   background: rgba(255, 255, 255, 1);
 }
 
-/* Bouton principal */
 .submit-button {
   background-color: #c0392b;
   color: white;
@@ -85,12 +83,17 @@ input:focus {
   background-color: #e74c3c;
 }
 
-/* Texte des erreurs */
-.error {
-  color: #e74c3c;
-  font-size: 14px;
-  margin-bottom: 15px;
+.form-group.has-error input {
+  border: 1px solid red; 
 }
+
+.error {
+  color: red;
+  font-size: 0.9em;
+  margin-bottom: 5px;
+  text-align: left; 
+}
+
 
 @media (max-width: 768px) {
   .register-container {

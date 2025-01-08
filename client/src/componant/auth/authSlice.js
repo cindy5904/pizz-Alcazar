@@ -111,6 +111,7 @@ const authSlice = createSlice({
     token: localStorage.getItem("token") || null,
     loading: false,
     error: null,
+    fieldErrors: {},
   },
   reducers: {
     resetAuthState: (state) => {
@@ -127,7 +128,12 @@ const authSlice = createSlice({
       })
       .addCase(registerUser.fulfilled, (state, action) => {
         state.loading = false;
-        state.user = action.payload;
+        if (action.payload) {
+          state.error = action.payload.message || "Une erreur est survenue."; 
+          state.fieldErrors = action.payload.errors || {}; 
+        } else {
+          state.error = action.error.message || "Une erreur inattendue s'est produite.";
+        }
       })
       .addCase(registerUser.rejected, (state, action) => {
         state.loading = false;

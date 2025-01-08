@@ -1,14 +1,14 @@
-/* Conteneur principal */
 .container-dashboard-admin {
     display: grid;
-    grid-template-columns: 1fr 4fr; /* Menu latéral et contenu */
+    grid-template-columns: 1fr 4fr; 
     gap: 20px;
     padding: 20px;
     background-color: #f5f7fa;
     min-height: 100vh;
+    margin-top: 100px;
   }
   
-  /* Menu latéral */
+  
   .sidebar-dashboard-admin {
     background-color: #fff;
     border-radius: 8px;

@@ -1,0 +1,84 @@
+.container-notification {
+    padding: 20px;
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
+    max-width: 800px;
+    margin: 180px auto;
+}
+
+.notification-title {
+    font-size: 1.8em;
+    color: #661c0c;
+    text-align: center;
+    margin-bottom: 20px;
+    border-bottom: 2px solid #ddd;
+    padding-bottom: 10px;
+}
+
+.no-command {
+    text-align: center;
+    color: #888;
+    font-size: 1.2em;
+    margin: 20px 0;
+}
+
+.command-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.command-item {
+    background-color: #fff;
+    margin-bottom: 15px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    box-shadow: 0px 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.command-number {
+    font-size: 1.2em;
+    color: #333;
+    margin-bottom: 8px;
+}
+
+.command-details {
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 8px;
+}
+
+.command-status {
+    font-size: 1em;
+    color: #555;
+    margin-bottom: 10px;
+}
+
+.status-label {
+    font-size: 0.9em;
+    color: #333;
+    display: block;
+    margin-bottom: 5px;
+}
+
+
+.status-select {
+    width: 100%;
+    padding: 8px;
+    font-size: 1em;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    background-color: #f9f9f9;
+}
+
+.status-select:focus {
+    border-color: #661c0c;
+    outline: none;
+}
+
+.status-option {
+    font-size: 1em;
+    color: #333;
+}

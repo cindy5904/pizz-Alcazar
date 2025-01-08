@@ -18,4 +18,5 @@ public class CommandeDtoPost {
     private String adresseLivraison;
     private String telephone;
     private Long panierId;
+    private Long paiementId;
 }

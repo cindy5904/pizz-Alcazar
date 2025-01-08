@@ -105,9 +105,7 @@ const Home = () => {
         <button onClick={() => setModalOpen(true)} className="btn-consulter-horaires">
           Consulter nos horaires ici
         </button>
-        {/* <Link to="/categories" className="btn-commander">
-      Commander
-    </Link> */}
+      
       </div>
         {modalOpen && (
           <div className="modal">

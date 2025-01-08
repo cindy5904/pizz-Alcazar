@@ -1,53 +1,51 @@
 .containerImgCategorieHome {
   display: flex;
   justify-content: space-between; 
-  align-items: flex-start; /* Aligne les images en haut */
+  align-items: flex-start; 
   margin: 0 auto;
   max-width: 1200px;
-  z-index: 200; /* Superpose les images sur le fond */
+  z-index: 200; 
   position: relative;
-  margin-top: -100px; /* Chevauche les images sur le fond */
-  opacity: 0; /* Caché par défaut */
-  transform: translateY(50px); /* Décalage pour l'effet d'entrée */
-  transition: opacity 1.5s ease, transform 1.5s ease; /* Transition fluide */
+  margin-top: -90px; 
+  opacity: 0; 
+  transform: translateY(50px); 
+  transition: opacity 1.5s ease, transform 1.5s ease; 
 }
 
 .containerImgCategorieHome.animate {
-  opacity: 1; /* Devient visible */
-  transform: translateY(0); /* Repositionne à l'emplacement initial */
+  opacity: 1; 
+  transform: translateY(0); 
 }
 
 .categoryImage {
-  width: calc(25% - 10px); /* Divise l'espace en quatre colonnes avec un écart */
-  object-fit: cover; /* Gère le ratio des images */
-  border: none; /* Supprime toute bordure */
-  transition: transform 0.3s ease; /* Ajoute une animation de survol */
+  width: calc(25% - 10px); 
+  object-fit: cover; 
+  border: none; 
+  transition: transform 0.3s ease; 
 }
 
 .categoryImage:hover {
-  transform: scale(1.1); /* Effet de zoom au survol */
+  transform: scale(1.1); 
 }
-
-
 
 .imgFar {
   display: flex;
   justify-content: center;
-  gap: 60px; /* Plus d’espace entre les cartes */
-  flex-wrap: wrap; /* Permet de s'adapter sur petits écrans */
+  gap: 60px; 
+  flex-wrap: wrap; 
 }
 
 .imgFar img {
   width: 350px; 
   height: auto;
-  border-radius: 10px; /* Coins arrondis */
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); /* Ombre subtile */
+  border-radius: 10px; 
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2); 
   transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .imgFar img:hover {
-  transform: scale(1.05); /* Zoom léger au survol */
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); /* Accentuation de l’ombre */
+  transform: scale(1.05); 
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3); 
 }
 
 .imgFar img:focus {
@@ -56,19 +54,18 @@
 
 .produitFar {
   padding: 20px;
-  background-color: #fafafa; /* Fond léger pour contraster */
+  background-color: #fafafa; 
   text-align: center;
   font-family: 'Arial', sans-serif;
 }
 
 .title-far {
   font-size: 2.5rem;
-  color: #7b0c10; /* Rouge foncé pour rappeler l'Italie */
+  color: #7b0c10; 
   margin-bottom: 20px;
   text-transform: uppercase;
   letter-spacing: 2px;
 }
-
 
 .containerSvg {
   position: relative;
@@ -81,37 +78,36 @@
 .contentSvg {
   width: 100%;
   height: 300px;
-  background-color: #b71c1c; /* Fond rouge */
+  background-color: #b71c1c; 
   margin-top: -30px;
   padding: 0;
   position: relative;
   z-index: 1;
   display: flex;
-  justify-content: center; /* Centrer horizontalement */
-  text-align: center; /* Centrer le texte */
+  justify-content: center; 
+  text-align: center; 
 }
 .fidelityText {
-  color: #fff; /* Texte en blanc */
-  font-family: 'Arial', sans-serif; /* Police élégante */
-  max-width: 800px; /* Largeur maximale pour le texte */
-  line-height: 1.6; /* Espacement des lignes */
-  padding: 10px; /* Espacement intérieur */
+  color: #fff; 
+  max-width: 800px; 
+  line-height: 1.6; 
+  padding: 10px; 
 }
 
 .h2HomeFidelite {
-  font-size: 2rem; /* Taille du titre */
-  font-weight: bold; /* Mettre en gras */
-  margin-bottom: 10px; /* Espacement sous le titre */
+  font-size: 2rem; 
+  font-weight: bold; 
+  margin-bottom: 10px; 
   color: #fafafa;
 }
 
 .fidelityText p {
-  font-size: 1.2rem; /* Taille des paragraphes */
-  margin-bottom: 8px; /* Espacement entre les paragraphes */
+  font-size: 1.2rem; 
+  margin-bottom: 8px; 
 }
 
 .fidelityText strong {
-  color: #ffd700; /* Couleur dorée pour les valeurs importantes */
+  color: #ffd700;
 }
 
 .fidelityText em {
@@ -123,14 +119,14 @@
 }
 
 .fidelityText {
-  opacity: 0; /* Caché par défaut */
-  transform: translateY(-50px); /* Positionné au-dessus */
-  transition: opacity 1.5s ease, transform 1.5s ease; /* Animation lente */
+  opacity: 0; 
+  transform: translateY(-50px); 
+  transition: opacity 1.5s ease, transform 1.5s ease; 
 }
 
 .fidelityText.animate {
-  opacity: 1; /* Devient visible */
-  transform: translateY(0); /* Repositionné à l'emplacement initial */
+  opacity: 1; 
+  transform: translateY(0); 
 }
 .serviceHome {
   text-align: center;
@@ -182,13 +178,13 @@
 
 .section-options {
   text-align: center;
-  padding: 60px 20px; /* Ajoute plus d'espace pour un effet visuel agréable */
-  margin-top: 30px;
-  background-image: url(../assets/images/interieur3.webp); /* Image d'intérieur du restaurant */
-  background-attachment: fixed; /* Création de l'effet parallax */
-  background-position: center; /* Centre l'image */
-  background-size: cover; /* Fait en sorte que l'image remplisse le conteneur */
-  background-repeat: no-repeat; /* Empêche la répétition de l'image */
+  padding: 60px 20px; 
+  margin-top: 20px;
+  background-image: url(../assets/images/interieur3.webp); 
+  background-attachment: fixed; 
+  background-position: center; 
+  background-size: cover; 
+  background-repeat: no-repeat; 
   color: #fff; 
   position: relative;
   z-index: 1;
@@ -201,14 +197,13 @@
   left: 0;
   width: 100%;
   height: 100%;
-  background-color: rgba(0, 0, 0, 0.7); /* Assombrit l'image (50% noir) */
-  
-  z-index: -1; /* Place le pseudo-élément derrière le contenu */
+  background-color: rgba(0, 0, 0, 0.7); 
+  z-index: -1; 
 }
 .contenu-texte {
-  max-width: 800px; /* Limite la largeur du texte */
-  margin: 0 auto; /* Centre le contenu */
-  text-align: center; /* Centre le texte */
+  max-width: 800px; 
+  margin: 0 auto; 
+  text-align: center; 
 }
 
 .contenu-texte h2 {
@@ -228,35 +223,35 @@
   margin-top: 20px;
   font-size: 1rem;
   color: #fff;
-  background-color: #e63946; /* Rouge vif */
+  background-color: #e63946; 
   border: none;
   padding: 10px 20px;
   border-radius: 5px;
-  text-decoration: none; /* Supprime le soulignement */
+  text-decoration: none; 
   cursor: pointer;
   transition: background-color 0.3s ease;
-  animation: heartbeat 1.5s infinite; /* Ajoute l'animation */
+  animation: heartbeat 1.5s infinite; 
 }
 
 .btn-commander:hover {
-  background-color: #c42d3a; /* Rouge légèrement plus foncé au survol */
-  animation: none; /* Désactive l'animation au survol */
+  background-color: #c42d3a; 
+  animation: none; 
 }
 @keyframes heartbeat {
   0% {
     transform: scale(1);
   }
   30% {
-    transform: scale(1.1); /* Augmente légèrement la taille */
+    transform: scale(1.1); 
   }
   50% {
-    transform: scale(1); /* Revient à la taille normale */
+    transform: scale(1); 
   }
   70% {
-    transform: scale(1.1); /* Deuxième battement */
+    transform: scale(1.1); 
   }
   100% {
-    transform: scale(1); /* Revient à la taille normale */
+    transform: scale(1); 
   }
 }
 .btn-consulter-horaires {
@@ -274,14 +269,14 @@
   background-color: #4a0a0a;
 }
 
-/* Modal Styles */
+
 .modal {
   position: fixed;
   top: 0;
   left: 0;
   width: 100vw;
   height: 100vh;
-  background-color: rgba(0, 0, 0, 0.7); /* Fond sombre transparent */
+  background-color: rgba(0, 0, 0, 0.7); 
   display: flex;
   justify-content: center;
   align-items: center;
@@ -300,13 +295,13 @@
 }
 
 .modal-content img {
-  max-width: 60%; /* Réduit la largeur maximale de l'image */
-  max-height: 60%; /* Réduit la hauteur maximale de l'image */
-  width: auto; /* Ajuste automatiquement la largeur */
-  height: auto; /* Ajuste automatiquement la hauteur */
-  border-radius: 10px; /* Coins arrondis pour une finition élégante */
-  margin: auto; /* Centre l'image dans la modale */
-  display: block; /* S'assure que l'image se comporte comme un bloc */
+  max-width: 60%; 
+  max-height: 60%; 
+  width: auto; 
+  height: auto; 
+  border-radius: 10px; 
+  margin: auto; 
+  display: block; 
 }
 
 

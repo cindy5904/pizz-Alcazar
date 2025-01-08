@@ -40,34 +40,34 @@ public class RecompenseService {
         Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId)
                 .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé"));
 
+        while (utilisateur.getPointsFidelite() >= 100) {
+            Recompense recompense = new Recompense();
+            recompense.setNom("Remise de 10%");
+            recompense.setDescription("Remise automatique pour avoir atteint 100 points de fidélité.");
+            recompense.setPointsNecessaires(100);
+            recompense.setCodeRemise(genererCodeRemise());
+            recompense.setDateRemise(LocalDate.now());
+            recompense.setUser(utilisateur); // Associer l'utilisateur à la récompense
 
-        Recompense recompense = new Recompense();
-        recompense.setNom("Remise de 10%");
-        recompense.setDescription("Remise automatique pour avoir atteint 100 points de fidélité.");
-        recompense.setPointsNecessaires(100);
+            recompenseRepository.save(recompense);
 
-        String codeRemise = genererCodeRemise();
-        recompense.setCodeRemise(codeRemise);
-        recompense.setDateRemise(LocalDate.now());
+            utilisateur.setPointsFidelite(utilisateur.getPointsFidelite() - 100);
+            System.out.println("Utilisateur associé : " + utilisateur.getId());
+            System.out.println("Récompense utilisateur avant sauvegarde : " + recompense.getUser().getId());
+            recompenseRepository.save(recompense);
 
-        recompenseRepository.save(recompense);
-
-        utilisateur.setPointsFidelite(utilisateur.getPointsFidelite() - 100);
-        utilisateurRepository.save(utilisateur);
+        }
     }
 
 
-    /**
-     * Récupérer l'historique des récompenses d'un utilisateur.
-     * @param utilisateurId l'ID de l'utilisateur.
-     * @return la liste des récompenses sous forme de DTO.
-     */
+
     public List<RecompenseDtoGet> getHistoriqueRecompenses(Long utilisateurId) {
         Utilisateur utilisateur = utilisateurRepository.findById(utilisateurId)
                 .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé"));
 
         // Récupérer toutes les récompenses de cet utilisateur
         List<Recompense> recompenses = recompenseRepository.findByUser(utilisateur);
+        System.out.println("Récompenses trouvées pour l'utilisateur : " + recompenses);
 
         // Convertir en DTO
         return recompenses.stream()
@@ -75,28 +75,20 @@ public class RecompenseService {
                 .collect(Collectors.toList());
     }
 
-    /**
-     * Convertir une entité Recompense en DTO RecompenseDtoGet.
-     * @param recompense l'entité Recompense.
-     * @return le DTO correspondant.
-     */
     private RecompenseDtoGet convertToDtoGet(Recompense recompense) {
         RecompenseDtoGet dto = new RecompenseDtoGet();
         dto.setId(recompense.getId());
         dto.setNom(recompense.getNom());
         dto.setDescription(recompense.getDescription());
         dto.setPointsNecessaires(recompense.getPointsNecessaires());
-        dto.setDateRemise(recompense.getDateRemise()); // Champ à ajouter dans l'entité Recompense
-        dto.setCodeRemise(recompense.getCodeRemise()); // Champ à ajouter dans l'entité Recompense
+        dto.setDateRemise(recompense.getDateRemise());
+        dto.setCodeRemise(recompense.getCodeRemise());
         return dto;
     }
 
-    /**
-     * Générer un code unique pour une récompense.
-     * @return le code de remise.
-     */
+
     private String genererCodeRemise() {
-        return UUID.randomUUID().toString().substring(0, 8); // Génère un code unique à partir d'un UUID
+        return UUID.randomUUID().toString().substring(0, 8);
     }
 
 }

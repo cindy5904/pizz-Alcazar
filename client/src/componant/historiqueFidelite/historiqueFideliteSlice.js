@@ -1,9 +1,6 @@
 import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import HistoriqueFideliteService from "../../service/historiqueFideliteService";
 
-// Async Thunks (Actions asynchrones)
-
-// Récupérer les commandes par semaine
 export const fetchCommandesParSemaine = createAsyncThunk(
   "historiqueFidelite/fetchCommandesParSemaine",
   async (dateDebut, { rejectWithValue }) => {
@@ -15,7 +12,6 @@ export const fetchCommandesParSemaine = createAsyncThunk(
   }
 );
 
-// Récupérer les récompenses par semaine
 export const fetchRecompensesParSemaine = createAsyncThunk(
   "historiqueFidelite/fetchRecompensesParSemaine",
   async (dateDebut, { rejectWithValue }) => {
@@ -49,14 +45,15 @@ const historiqueFideliteSlice = createSlice({
     loading: false,
     error: null,
   },
-  reducers: {}, // Pas de reducers standards ici, on utilise des thunks
+  reducers: {}, 
   extraReducers: (builder) => {
     builder
-      // Gestion de l'état des commandes par semaine
+    
       .addCase(fetchCommandesParSemaine.pending, (state) => {
         state.loading = true;
       })
       .addCase(fetchCommandesParSemaine.fulfilled, (state, action) => {
+        console.log("Payload commandes par semaine:", action.payload);
         state.loading = false;
         state.commandesParSemaine = action.payload;
       })

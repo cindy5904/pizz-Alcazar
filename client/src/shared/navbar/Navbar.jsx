@@ -4,15 +4,16 @@ import { FaUser, FaSignOutAlt,FaShoppingCart } from 'react-icons/fa';
 import { useDispatch, useSelector } from 'react-redux';
 import { Link } from 'react-router-dom';
 import { logoutUser } from '../../componant/auth/authSlice';
+import { selectTotalArticles } from '../../componant/panier/panierSlice';
 import logo from "../../assets/images/logo1.png"
 
 
 const Navbar = () => {
-  
     const [isOpen, setIsOpen] = useState(false);
     const user = useSelector((state) => state.auth.user);
     const roles = useSelector((state) => state.auth.user?.roles || []);
     console.log("User dans Navbar après récupération :", user);
+    const totalArticles = useSelector(selectTotalArticles);
     const dispatch = useDispatch();
     console.log('User dans Navbar:', user);
 
@@ -21,7 +22,6 @@ const Navbar = () => {
         localStorage.removeItem('token');
     };
 
-  
     const toggleMenu = () => {
       setIsOpen(!isOpen);
     };
@@ -40,6 +40,9 @@ const Navbar = () => {
           <li><Link to="/categories">Produit</Link></li>
           <li><a href="#contact">Contact</a></li>
           <li><Link to="/consulter-la-carte">Notre carte</Link></li>
+          {Array.isArray(roles) && roles.includes("ROLE_ADMIN") && (
+                            <li><Link to="/commande-recue">Commandes Reçues</Link></li>
+                        )}
         </ul>
       </div>
       <div className={`nav-actions ${isOpen ? 'open' : ''}`}>
@@ -54,8 +57,11 @@ const Navbar = () => {
         ) : (
           <Link to="/login">Mon compte</Link>
         )}
-        <Link to="/panier">
+         <Link to="/panier" className="panier-link">
           <FaShoppingCart className="panier-icon cart-icon" />
+          {totalArticles > 0 && (
+            <span className="cart-count">{totalArticles}</span> 
+          )}
         </Link>
       </div>
       <div className="burger-menu" onClick={toggleMenu}>

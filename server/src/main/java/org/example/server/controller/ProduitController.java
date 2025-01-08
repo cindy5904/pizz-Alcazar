@@ -1,5 +1,6 @@
 package org.example.server.controller;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.example.server.dto.produit.ProduitDtoGet;
 import org.example.server.dto.produit.ProduitDtoPost;
 import org.example.server.service.ProduitService;
@@ -100,8 +101,14 @@ public class ProduitController {
     // Endpoint pour supprimer un produit
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{produitId}")
-    public ResponseEntity<Void> supprimerProduit(@PathVariable Long produitId) {
-        produitService.supprimerProduit(produitId);
-        return ResponseEntity.noContent().build(); // 204 No Content
+    public ResponseEntity<?> supprimerProduit(@PathVariable Long produitId) {
+        try {
+            produitService.supprimerProduit(produitId);
+            return ResponseEntity.ok("Produit supprimé avec succès.");
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Impossible de supprimer le produit.");
+        }
     }
 }

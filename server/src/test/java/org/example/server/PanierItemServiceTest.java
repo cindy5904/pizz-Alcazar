@@ -17,6 +17,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import java.util.Optional;
@@ -26,6 +27,7 @@ import static org.mockito.ArgumentMatchers.anyLong;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
+@SpringBootTest
 @Import(TestSecurityConfig.class)
 public class PanierItemServiceTest {
     @InjectMocks
@@ -116,16 +118,16 @@ public class PanierItemServiceTest {
 
     @Test
     public void testReduireQuantiteItem_SupprimeItemSiQuantiteEgaleZero() {
-        // Simule la situation où l'item existe
-        when(panierItemRepository.findByProduitIdAndPanierId(anyLong(), anyLong())).thenReturn(panierItem);
 
-        // Appel à la méthode à tester avec une réduction qui fait tomber la quantité à 0
+        when(panierItemRepository.findByProduitIdAndPanierId(1L, 1L)).thenReturn(panierItem);
+
         PanierItemDtoGet result = panierItemService.reduireQuantiteItem(1L, 1L, 3);
 
-        // Vérifie que l'item a été supprimé
-        verify(panierItemRepository, times(1)).deleteByProduitIdAndPanierId(1L, 1L);
-        assertNull(result); // Puisque l'item a été supprimé, le retour doit être null
+        verify(panierItemRepository, times(1)).delete(panierItem);
+        assertNull(result);
     }
+
+
 
     @Test
     public void testSupprimerItem() {

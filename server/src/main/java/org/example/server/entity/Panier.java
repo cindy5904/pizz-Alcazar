@@ -26,4 +26,8 @@ public class Panier {
     private List<PanierItem> itemsPanier;
     @OneToOne(mappedBy = "panier")
     private Commande commande;
+
+    public Panier(Long id) {
+        this.id = id;
+    }
 }

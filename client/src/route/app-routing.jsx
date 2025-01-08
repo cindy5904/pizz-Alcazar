@@ -16,8 +16,9 @@ import InfoModifClient from "../componant/utilisateur/client/edit/InfoModifClien
 import { PayPalScriptProvider } from "@paypal/react-paypal-js";
 import Success from "../componant/paiement/success/Success";
 import Layout from "../shared/Layout";
-import DashboardAdmin from "../componant/utilisateur/admin/DashBoardAdmin";
+import DashboardAdmin from "../componant/utilisateur/admin/DashboardAdmin";
 import ProtectedRoute from "../componant/route/ProtectedRoute";
+import NotificationCommande from "../componant/utilisateur/admin/NotificationCommande";
 
 
 const initialPayPalOptions = {
@@ -93,13 +94,14 @@ const router = createBrowserRouter([
     },
     
     {
-        path: "", // Ajoute un chemin vide ici
+        path: "", 
         element: <ProtectedRoute allowedRoles={['ROLE_ADMIN']} />,
         children: [
           { path: "/produits/ajouter", element: <ProduitForm /> },
           { path: "/produits/modifier/:id", element: <ProduitForm /> },
           { path: "/formcategorie", element: <CategorieForm /> },
           { path: "/admin", element: <DashboardAdmin /> },
+          { path : "commande-recue", element : <NotificationCommande/>},
         ],
       },
 

@@ -19,22 +19,23 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
+@SpringBootTest
 @Import(TestSecurityConfig.class)
 public class PanierserviceTest {
+
     @InjectMocks
     private PanierService panierService;
 
@@ -52,6 +53,7 @@ public class PanierserviceTest {
 
     private Utilisateur utilisateur;
     private Panier panier;
+    private Produit produit;
 
     @Before
     public void setUp() {
@@ -60,76 +62,59 @@ public class PanierserviceTest {
         utilisateur.setNom("Dupont");
         utilisateur.setPrenom("Jean");
 
+        produit = new Produit();
+        produit.setId(1L);
+        produit.setNom("Produit Test");
+
         panier = new Panier();
         panier.setId(1L);
         panier.setDateCreation(LocalDateTime.now());
         panier.setDateModification(LocalDateTime.now());
         panier.setUser(utilisateur);
+        panier.setActif(true);
+        panier.setItemsPanier(new ArrayList<>());
     }
+
+    // ======= Tests Existant =======
 
     @Test
     public void testCreatePanier() {
-        // Arrange
         PanierDtoPost dtoPost = new PanierDtoPost();
         dtoPost.setUserId(utilisateur.getId());
 
-        // Créez une liste d'itemsPanier pour le DTO
         List<PanierItemDtoPost> itemsPanier = new ArrayList<>();
         PanierItemDtoPost itemDto = new PanierItemDtoPost();
-        itemDto.setProduitId(1L); // ID du produit
-        itemDto.setQuantite(2); // Quantité
+        itemDto.setProduitId(1L);
+        itemDto.setQuantite(2);
         itemsPanier.add(itemDto);
         dtoPost.setItemsPanier(itemsPanier);
 
-        // Mocking de la recherche de l'utilisateur
         when(utilisateurRepository.findById(utilisateur.getId())).thenReturn(Optional.of(utilisateur));
-
-        // Mocking de la recherche du produit
-        Produit produit = new Produit(); // Créez un produit factice
-        produit.setId(1L);
-        produit.setNom("Produit Test");
         when(produitRepository.findById(itemDto.getProduitId())).thenReturn(Optional.of(produit));
-
-        // Mocking du save du panier
         when(panierRepository.save(any(Panier.class))).thenReturn(panier);
-        System.out.println("Avant l'appel à createPanier");
-        // Act
-        PanierDtoGet result = panierService.addOrUpdatePanierItem(dtoPost);
 
-        System.out.println("Après l'appel à createPanier");
-        System.out.println("Valeur retournée : " + result);
-        // Assert
+        PanierDtoGet result = panierService.addOrUpdatePanierItem(utilisateur.getId(), itemDto);
+
         assertNotNull(result);
         assertEquals(panier.getId(), result.getId());
-
-
-        // Vérifiez l'utilisateur dans le résultat
         assertNotNull(result.getUser());
         assertEquals(utilisateur.getId(), result.getUser().getId());
         assertEquals(utilisateur.getNom(), result.getUser().getNom());
         assertEquals(utilisateur.getPrenom(), result.getUser().getPrenom());
-
-        // Ajoutez d'autres assertions pour vérifier les itemsPanier, etc.
     }
-
-
 
     @Test
     public void testGetPanierByUserId() {
-        // Arrange
         when(panierRepository.findByUserId(utilisateur.getId())).thenReturn(Optional.of(panier));
 
-        // Act
         PanierDtoGet result = panierService.getPanierByUserId(utilisateur.getId());
 
-        // Assert
         assertNotNull(result);
         assertEquals(panier.getId(), result.getId());
     }
 
     @Test
     public void testGetProduitsByPanierId_Success() {
-        // Arrange
         Long panierId = 1L;
         Produit produit1 = new Produit();
         produit1.setId(1L);
@@ -138,23 +123,66 @@ public class PanierserviceTest {
 
         PanierItem item1 = new PanierItem();
         item1.setProduit(produit1);
-        item1.setPanier(new Panier()); // Juste pour satisfaire la relation
+        item1.setPanier(panier);
 
         PanierItem item2 = new PanierItem();
         item2.setProduit(produit2);
-        item2.setPanier(new Panier());
+        item2.setPanier(panier);
 
         List<PanierItem> items = Arrays.asList(item1, item2);
 
-        Mockito.when(panierItemRepository.findByPanierId(panierId)).thenReturn(items);
+        when(panierItemRepository.findByPanierId(panierId)).thenReturn(items);
 
-        // Act
         List<Produit> result = panierService.getProduitsByPanierId(panierId);
 
-        // Assert
         assertEquals(2, result.size());
         assertEquals(produit1.getId(), result.get(0).getId());
         assertEquals(produit2.getId(), result.get(1).getId());
     }
 
+    // ======= Nouveaux Tests =======
+
+    @Test
+    public void testAddNewPanierItem() {
+        PanierItemDtoPost itemDto = new PanierItemDtoPost();
+        itemDto.setProduitId(1L);
+        itemDto.setQuantite(2);
+
+        when(utilisateurRepository.findById(utilisateur.getId())).thenReturn(Optional.of(utilisateur));
+        lenient().when(panierRepository.findByUserIdAndActifTrue(utilisateur.getId())).thenReturn(Optional.of(panier));
+        when(produitRepository.findById(produit.getId())).thenReturn(Optional.of(produit));
+        when(panierRepository.save(any(Panier.class))).thenReturn(panier);
+
+        PanierDtoGet result = panierService.addOrUpdatePanierItem(utilisateur.getId(), itemDto);
+
+        assertNotNull(result);
+        assertEquals(1, result.getItemsPanier().size());
+        assertEquals(produit.getId(), result.getItemsPanier().get(0).getProduit().getId());
+        assertEquals(2, result.getItemsPanier().get(0).getQuantite());
+    }
+
+    @Test
+    public void testUpdateExistingPanierItem() {
+        PanierItem existingItem = new PanierItem();
+        existingItem.setId(1L);
+        existingItem.setProduit(produit);
+        existingItem.setQuantite(1);
+        existingItem.setPanier(panier);
+        panier.setItemsPanier(Collections.singletonList(existingItem));
+
+        PanierItemDtoPost itemDto = new PanierItemDtoPost();
+        itemDto.setProduitId(1L);
+        itemDto.setQuantite(3);
+
+        when(panierRepository.findByUserIdAndActifTrue(utilisateur.getId())).thenReturn(Optional.of(panier));
+        when(panierItemRepository.save(any(PanierItem.class))).thenReturn(existingItem);
+        when(panierRepository.save(any(Panier.class))).thenReturn(panier);
+
+        PanierDtoGet result = panierService.addOrUpdatePanierItem(utilisateur.getId(), itemDto);
+
+        assertNotNull(result);
+        assertEquals(1, result.getItemsPanier().size());
+        assertEquals(4, result.getItemsPanier().get(0).getQuantite());
+    }
 }
+

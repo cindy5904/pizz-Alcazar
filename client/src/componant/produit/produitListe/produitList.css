@@ -7,7 +7,7 @@
 
 .produit-titre {
     text-align: center;
-    color: #b34700; 
+    color: #b34700;
     font-size: 2.5rem;
     margin-bottom: 30px;
 }
@@ -23,6 +23,11 @@
     border-radius: 15px;
     box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
     transition: transform 0.2s ease-in-out;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    height: 100%;
+    min-height: 450px;
 }
 
 .produit-card:hover {
@@ -45,11 +50,15 @@
 .produit-details {
     padding: 15px;
     text-align: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    gap: 10px;
 }
 
 .produit-nom {
     font-size: 1.5rem;
-    color: #d35400; /* Couleur chaude */
+    color: #d35400;
     margin: 10px 0;
 }
 
@@ -57,12 +66,17 @@
     font-size: 1rem;
     color: #555;
     margin-bottom: 15px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 }
 
 .produit-prix {
     font-size: 1.3rem;
     font-weight: bold;
-    color: #27ae60; /* Accent de vert pour le prix */
+    color: #446c22;
 }
 
 .btn {
@@ -78,8 +92,10 @@
 }
 
 .btn-add {
-    background-color: #e67e22;
+    background-color: #C0392B;
     color: #fff;
+    margin: 5px auto 20px auto;
+    
 }
 
 .btn-add:hover {
@@ -94,4 +110,14 @@
 .btn-delete {
     background-color: #e74c3c;
     color: #fff;
+}
+
+@media (max-width: 768px) {
+    .produit-list {
+        grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    }
+
+    .produit-image {
+        height: 200px;
+    }
 }

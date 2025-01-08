@@ -52,7 +52,12 @@ public class PanierService {
                     newPanier.setUser(user);
                     newPanier.setDateCreation(LocalDateTime.now());
                     newPanier.setActif(true);
-                    return panierRepository.save(newPanier);
+                    Panier savedPanier = panierRepository.save(newPanier);
+
+                    // Désactiver les anciens paniers actifs pour cet utilisateur
+                    panierRepository.deactivateOtherPaniers(userId, savedPanier.getId());
+
+                    return savedPanier;
                 });
 
         // 2. Vérifiez si le produit est déjà dans le panier
@@ -85,7 +90,6 @@ public class PanierService {
         System.out.println("Panier mis à jour avec succès : " + panier);
         return mapToDtoGet(panier); // Retourner le panier mis à jour
     }
-
 
 
 
@@ -157,4 +161,7 @@ public class PanierService {
                 .map(PanierItem::getProduit)
                 .collect(Collectors.toList());
     }
+
 }
+
+

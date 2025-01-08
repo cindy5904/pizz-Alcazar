@@ -38,6 +38,18 @@ export const obtenirPaiementsParCommandeId = createAsyncThunk(
         }
     }
 );
+export const obtenirCommandesPayees = createAsyncThunk(
+    'paiements/obtenirCommandesPayees',
+    async (_, { rejectWithValue }) => {
+        try {
+            const response = await PaiementService.obtenirCommandesPayees();
+            return response;
+        } catch (error) {
+            return rejectWithValue(error.response.data);
+        }
+    }
+);
+
 export const createPayPalOrder = createAsyncThunk(
     'paiements/createPayPalOrder',
     async (commandeId, { rejectWithValue }) => {
@@ -95,6 +107,7 @@ const paiementSlice = createSlice({
                 state.statutPaiement = null; 
             })
             .addCase(creerPaiement.fulfilled, (state, action) => {
+                console.log("Données reçues dans creerPaiement.fulfilled :", action.payload);
                 state.chargement = false;
                 state.paiementActuel = action.payload;
                 state.statutPaiement = action.payload.statut; 
@@ -111,6 +124,18 @@ const paiementSlice = createSlice({
             .addCase(obtenirPaiementsParCommandeId.fulfilled, (state, action) => {
                 state.chargement = false;
                 state.paiements = action.payload;
+            })
+            .addCase(obtenirCommandesPayees.pending, (state) => {
+                state.chargement = true;
+                state.erreur = null;
+            })
+            .addCase(obtenirCommandesPayees.fulfilled, (state, action) => {
+                state.chargement = false;
+                state.paiements = action.payload; // Stocker les commandes payées
+            })
+            .addCase(obtenirCommandesPayees.rejected, (state, action) => {
+                state.chargement = false;
+                state.erreur = action.payload;
             })
             .addCase(createPayPalOrder.pending, (state) => {
                 state.chargement = true;

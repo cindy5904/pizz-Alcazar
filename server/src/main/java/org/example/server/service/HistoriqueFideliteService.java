@@ -17,6 +17,7 @@ import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.time.format.DateTimeParseException;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Service
@@ -60,17 +61,65 @@ public class HistoriqueFideliteService {
     }
 
     public long countRecompensesParMois(int annee, int mois) {
-        // Récupération de l'historique des récompenses pour le mois spécifié
         List<HistoriqueFideliteDtoGet> historiques = getHistoriqueParMois(annee, mois);
 
-        // Compter le nombre total de récompenses
+
         return historiques.stream()
-                .mapToInt(h -> h.getRecompenseId() != null ? 1 : 0) // S'assurer qu'on ne compte que les entrées valides
+                .mapToInt(h -> h.getRecompenseId() != null ? 1 : 0)
                 .sum();
+    }
+    public List<Long> getCommandesParSemaine(LocalDate dateDebut) {
+        LocalDate dateFin = dateDebut.plusDays(7);
+        System.out.println("=== LOG: Commandes par semaine ===");
+        System.out.println("Date début : " + dateDebut);
+        System.out.println("Date fin : " + dateFin);
+
+        List<Long> commandes = historiqueFideliteRepository.findByDateTransactionBetween(dateDebut.atStartOfDay(), dateFin.atStartOfDay())
+                .stream()
+                .collect(Collectors.groupingBy(
+                        historique -> historique.getDateTransaction().toLocalDate(),
+                        Collectors.counting()
+                ))
+                .entrySet()
+                .stream()
+                .sorted(Map.Entry.comparingByKey())
+                .map(Map.Entry::getValue)
+                .collect(Collectors.toList());
+
+        System.out.println("Commandes trouvées : " + commandes);
+        return commandes;
+    }
+
+    public long countRecompensesParSemaine(LocalDate dateDebut) {
+        LocalDate dateFin = dateDebut.plusDays(7);
+        return historiqueFideliteRepository.findByDateTransactionBetween(dateDebut.atStartOfDay(), dateFin.atStartOfDay())
+                .stream()
+                .filter(h -> h.getRecompense() != null)
+                .count();
+    }
+    public double compareSemaineCommandes(LocalDate semaineActuelle) {
+        LocalDate semainePrecedente = semaineActuelle.minusWeeks(1);
+
+        System.out.println("=== LOG: Comparaison des commandes ===");
+        System.out.println("Semaine actuelle : " + semaineActuelle);
+        System.out.println("Semaine précédente : " + semainePrecedente);
+
+        long totalActuel = getCommandesParSemaine(semaineActuelle).stream().mapToLong(Long::longValue).sum();
+        long totalPrecedent = getCommandesParSemaine(semainePrecedente).stream().mapToLong(Long::longValue).sum();
+
+        System.out.println("Total actuel : " + totalActuel);
+        System.out.println("Total précédent : " + totalPrecedent);
+
+        if (totalPrecedent == 0) {
+            return 0.0;
+        }
+
+        double pourcentage = (double) (totalActuel - totalPrecedent) / totalPrecedent * 100;
+        System.out.println("Pourcentage de variation : " + pourcentage);
+        return pourcentage;
     }
 
 
-    // Convertisseur pour DTO
     public HistoriqueFideliteDtoGet convertToDto(HistoriqueFidelite historique) {
         HistoriqueFideliteDtoGet dto = new HistoriqueFideliteDtoGet();
         dto.setId(historique.getId());

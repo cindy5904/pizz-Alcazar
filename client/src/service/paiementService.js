@@ -29,31 +29,36 @@ const PaiementService = {
         const response = await axios.get(`${URL_API}/commande/${commandeId}`);
         return response.data;
     },
+    obtenirCommandesPayees: async () => {
+        const response = await axios.get(`${URL_API}/commandes-payees`);
+        return response.data;
+    },
+    
     createPayPalOrder: async (commandeId) => {
         const response = await axios.post(
             `${URL_API}/paypal/create-order/${commandeId}`,
-            {}, // Corps vide
+            {}, 
             {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
             }
         );
-        return response.data; // Retourne l'Order ID ou les détails nécessaires
+        return response.data; 
     },
 
-    // Capture du paiement PayPal
+    
     capturePayPalOrder: async (orderId, commandeId) => {
         const response = await axios.post(
             `${URL_API}/paypal/capture-order/${orderId}/${commandeId}`,
-            {}, // Corps vide
+            {}, 
             {
                 headers: {
                     Authorization: `Bearer ${localStorage.getItem('token')}`,
                 },
             }
         );
-        return response.data; // Retourne les détails du paiement capturé
+        return response.data;
     },
 };
 

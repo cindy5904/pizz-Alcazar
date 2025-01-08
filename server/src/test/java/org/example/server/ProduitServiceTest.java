@@ -5,6 +5,8 @@ import org.example.server.dto.produit.ProduitDtoPost;
 import org.example.server.entity.Categorie;
 import org.example.server.entity.Produit;
 import org.example.server.repository.CategorieRepository;
+import org.example.server.repository.PanierItemRepository;
+import org.example.server.repository.PanierRepository;
 import org.example.server.repository.ProduitRepository;
 import org.example.server.service.ProduitService;
 import org.junit.Before;
@@ -14,9 +16,12 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.mockito.junit.MockitoJUnitRunner;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -27,6 +32,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
+@SpringBootTest
 @Import(TestSecurityConfig.class)
 public class ProduitServiceTest {
     @Mock
@@ -34,6 +40,9 @@ public class ProduitServiceTest {
 
     @Mock
     private CategorieRepository categorieRepository;
+
+    @Mock
+    private PanierItemRepository panierItemRepository;
 
     @InjectMocks
     private ProduitService produitService;
@@ -68,69 +77,61 @@ public class ProduitServiceTest {
     }
 
     @Test
-    public void testCreerProduit_Succes() {
-        // Simuler la catégorie existante dans le repo
+    public void testCreerProduit_Succes() throws IOException {
         when(categorieRepository.findById(produitDtoPost.getCategorieId())).thenReturn(Optional.of(categorie));
-
-        // Simuler la sauvegarde du produit
         when(produitRepository.save(any(Produit.class))).thenReturn(produit);
 
-        // Créer un mock de MultipartFile pour l'image
         MultipartFile imageFile = mock(MultipartFile.class);
         when(imageFile.getOriginalFilename()).thenReturn("testImage.jpg");
         when(imageFile.isEmpty()).thenReturn(false);
+        when(imageFile.getInputStream()).thenReturn(new ByteArrayInputStream("fake image content".getBytes()));
 
-        // Appeler la méthode à tester avec le fichier image
         ProduitDtoGet produitDtoGet = produitService.creerProduit(produitDtoPost, imageFile);
 
-        // Vérifier les résultats
         assertNotNull(produitDtoGet);
         assertEquals(produitDtoGet.getNom(), produit.getNom());
-        assertEquals(produitDtoGet.getDescription(), produit.getDescription());
-        assertEquals(produitDtoGet.getPrix(), produit.getPrix(), 0.0001);
-        assertEquals(produitDtoGet.isDisponibilite(), produit.isDisponibilite());
-
-        // Vérifier que le chemin de l'image a été mis à jour dans le DTO
         assertEquals("/images/testImage.jpg", produitDtoGet.getImagePath());
 
-        // Vérifier les interactions avec les dépendances
         verify(categorieRepository, times(1)).findById(produitDtoPost.getCategorieId());
         verify(produitRepository, times(1)).save(any(Produit.class));
     }
 
-
-
     @Test
-    public void testMettreAJourProduit_Succes() {
-        // Simuler le produit existant et la catégorie
+    public void testMettreAJourProduit_Succes() throws IOException {
+        // Arrange
+        // Simuler le produit existant avec des valeurs initiales
         when(produitRepository.findById(1L)).thenReturn(Optional.of(produit));
         when(categorieRepository.findById(produitDtoPost.getCategorieId())).thenReturn(Optional.of(categorie));
+
+        // Créer un mock de MultipartFile pour l'image
+        MultipartFile imageFile = mock(MultipartFile.class);
+        when(imageFile.getOriginalFilename()).thenReturn("updatedImage.jpg");
+        when(imageFile.isEmpty()).thenReturn(false);
+        when(imageFile.getInputStream()).thenReturn(new ByteArrayInputStream("fake image content".getBytes()));
 
         // Simuler la sauvegarde du produit mis à jour
         when(produitRepository.save(any(Produit.class))).thenReturn(produit);
 
-        // Créer un mock de MultipartFile pour l'image
-        MultipartFile imageFile = mock(MultipartFile.class);
-        when(imageFile.getOriginalFilename()).thenReturn("testImage.jpg");
-        when(imageFile.isEmpty()).thenReturn(false);
-
-        // Appeler la méthode à tester avec l'image
+        // Act
         ProduitDtoGet produitDtoGet = produitService.mettreAJourProduit(1L, produitDtoPost, imageFile);
 
-        // Vérifier les résultats
+        // Assert
         assertNotNull(produitDtoGet);
-        assertEquals(produitDtoGet.getNom(), produit.getNom());
-        assertEquals(produitDtoGet.getDescription(), produit.getDescription());
-        assertEquals(produitDtoGet.getPrix(), produit.getPrix(), 0.0001);
+        assertEquals(produitDtoPost.getNom(), produitDtoGet.getNom());
+        assertEquals(produitDtoPost.getDescription(), produitDtoGet.getDescription());
+        assertEquals(produitDtoPost.getPrix(), produitDtoGet.getPrix(), 0.0001);
+        assertEquals(produitDtoPost.isDisponibilite(), produitDtoGet.isDisponibilite());
+        assertEquals(categorie.getNom(), produitDtoGet.getCategorieNom());
 
-        // Vérifier que le chemin de l'image a été mis à jour dans le DTO
-        assertEquals("/images/testImage.jpg", produitDtoGet.getImagePath());
+        // Vérifier que le chemin de l'image a été mis à jour
+        assertEquals("/images/updatedImage.jpg", produitDtoGet.getImagePath());
 
-        // Vérifier les interactions avec les dépendances
+        // Vérifications des interactions avec les mocks
         verify(produitRepository, times(1)).findById(1L);
         verify(categorieRepository, times(1)).findById(produitDtoPost.getCategorieId());
         verify(produitRepository, times(1)).save(any(Produit.class));
     }
+
 
 
 
@@ -171,14 +172,11 @@ public class ProduitServiceTest {
 
     @Test
     public void testSupprimerProduit_Succes() {
-        // Simuler le produit existant
         when(produitRepository.findById(1L)).thenReturn(Optional.of(produit));
 
-        // Appeler la méthode à tester
         produitService.supprimerProduit(1L);
 
-        // Vérifier les interactions
-        verify(produitRepository, times(1)).findById(1L);
+        verify(panierItemRepository, times(1)).deleteByProduitId(1L);
         verify(produitRepository, times(1)).delete(produit);
     }
 

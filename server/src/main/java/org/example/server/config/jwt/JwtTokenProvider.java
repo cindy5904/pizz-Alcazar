@@ -32,17 +32,14 @@ public class JwtTokenProvider {
 
     public String generateToken(Authentication auth) {
         String username = auth.getName();
-        // Extraire les rôles (autorités) de l'objet Authentication
         String roles = auth.getAuthorities().stream()
                 .map(grantedAuthority -> grantedAuthority.getAuthority())
                 .collect(Collectors.joining(","));
 
         Long id = ((Utilisateur) auth.getPrincipal()).getId();
-
         System.out.println("id " + id);
-
         Date currentDate = new Date();
-        Date expireDate = new Date(currentDate.getTime() + 86400000); // 24 heures
+        Date expireDate = new Date(currentDate.getTime() + 86400000);
 
         String token = Jwts.builder()
                 .setSubject(username)
@@ -61,12 +58,11 @@ public class JwtTokenProvider {
                     .setSigningKey(getSigningKey())
                     .build()
                     .parseClaimsJws(token);
-            return true; // Le token est valide
+            return true;
         } catch (Exception ex) {
             throw new AuthenticationCredentialsNotFoundException("JWT was expired or incorrect");
         }
     }
-
 
     public String getUsernameFromToken(String token) {
         Claims claims = Jwts.parserBuilder()

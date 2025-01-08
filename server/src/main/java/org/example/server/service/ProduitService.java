@@ -1,11 +1,13 @@
 package org.example.server.service;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 import org.example.server.dto.produit.ProduitDtoGet;
 import org.example.server.dto.produit.ProduitDtoPost;
 import org.example.server.entity.Categorie;
 import org.example.server.entity.Produit;
 import org.example.server.repository.CategorieRepository;
+import org.example.server.repository.PanierItemRepository;
 import org.example.server.repository.ProduitRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -26,6 +28,8 @@ public class ProduitService {
 
     @Autowired
     private CategorieRepository categorieRepository;
+    @Autowired
+    private PanierItemRepository panierItemRepository;
 
     // Mapper de Produit vers ProduitDtoGet
     private ProduitDtoGet mapToDtoGet(Produit produit) {
@@ -148,11 +152,17 @@ public class ProduitService {
     }
 
     // Supprimer un produit
+    @Transactional
     public void supprimerProduit(Long produitId) {
+        // Supprimer les dépendances dans panier_items
+        panierItemRepository.deleteByProduitId(produitId);
+
+        // Supprimer le produit
         Produit produit = produitRepository.findById(produitId)
                 .orElseThrow(() -> new EntityNotFoundException("Produit non trouvé"));
         produitRepository.delete(produit);
     }
+
 
     private String saveImage(MultipartFile imageFile) {
         try {

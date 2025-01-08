@@ -13,13 +13,15 @@ const Register = () => {
   const [motDePasse, setMotDePasse] = useState("");
   const [adresse, setAdresse] = useState("");
   const [telephone, setTelephone] = useState("");
+  const [fieldErrors, setFieldErrors] = useState({});
+
 
   const dispatch = useDispatch();
   const loading = useSelector((state) => state.auth.loading);
   const error = useSelector((state) => state.auth.error);
   const navigate = useNavigate();
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     const userData = {
       nom,
@@ -29,9 +31,16 @@ const Register = () => {
       adresse,
       telephone,
     };
-    dispatch(registerUser(userData));
-    navigate("/login");
+  
+    try {
+      await dispatch(registerUser(userData)).unwrap();
+      navigate("/login");
+    } catch (err) {
+      console.error("Erreur lors de l'enregistrement :", err);
+    }
   };
+  
+  
 
   return (
     <>
@@ -69,7 +78,8 @@ const Register = () => {
                   required
                 />
               </div>
-              <div className="form-group">
+              <div className={`form-group ${fieldErrors?.motDePasse ? "has-error" : ""}`}>
+                {fieldErrors?.motDePasse && <p className="error">{fieldErrors.motDePasse}</p>} 
                 <input
                   type="password"
                   placeholder="Mot de passe"
@@ -78,6 +88,7 @@ const Register = () => {
                   required
                 />
               </div>
+
               <div className="form-group">
                 <input
                   type="text"

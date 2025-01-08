@@ -29,13 +29,20 @@ export const supprimerPanier = createAsyncThunk('panier/supprimerPanier', async 
     return panierId; 
 });
 
-// Action pour réinitialiser le panier
+
 export const reinitialiserPanier = createAsyncThunk(
     'panier/reinitialiserPanier',
     async () => {
         return null; 
     }
 );
+export const selectTotalArticles = (state) => {
+    if (state.panier.panier && state.panier.panier.itemsPanier) {
+      return state.panier.panier.itemsPanier.reduce((total, item) => total + item.quantite, 0);
+    }
+    return 0; 
+  };
+  
 
 
 

@@ -6,6 +6,7 @@ import com.paypal.sdk.exceptions.ApiException;
 import com.paypal.sdk.http.response.ApiResponse;
 import com.paypal.sdk.models.*;
 import jakarta.persistence.EntityNotFoundException;
+import org.example.server.dto.commande.CommandeDtoGet;
 import org.example.server.dto.paiement.PaiementDtoGet;
 import org.example.server.dto.paiement.PaiementDtoPost;
 import org.example.server.entity.Commande;
@@ -25,6 +26,7 @@ import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Service
 public class PaiementService {
@@ -44,16 +46,14 @@ public class PaiementService {
         this.client = client;
     }
 
-
     @Transactional
     public PaiementDtoGet createPaiement(PaiementDtoPost dtoPost) {
         Paiement paiement = new Paiement();
         paiement.setMontant(dtoPost.getMontant());
 
-        // Définir le statut ou une valeur par défaut
         StatutPaiement statut;
         try {
-            statut = StatutPaiement.valueOf(dtoPost.getStatut());
+            statut = StatutPaiement.valueOf(String.valueOf(dtoPost.getStatut()));
         } catch (IllegalArgumentException e) {
             statut = StatutPaiement.EN_ATTENTE;
         }
@@ -62,35 +62,43 @@ public class PaiementService {
         paiement.setMoyenPaiement(dtoPost.getMoyenPaiement());
         paiement.setDatePaiement(LocalDateTime.now());
 
-        // Assurez-vous que la commande existe avant de l'ajouter
         Commande commande = commandeRepository.findById(dtoPost.getCommandeId())
                 .orElseThrow(() -> new RuntimeException("Commande non trouvée pour l'ID : " + dtoPost.getCommandeId()));
+
         paiement.setCommande(commande);
+        commande.setPaiement(paiement);
 
         Paiement savedPaiement = paiementRepository.save(paiement);
+        commandeRepository.save(commande);
 
-        // Ajouter les points de fidélité si le paiement est validé
+        System.out.println("Paiement enregistré : " + savedPaiement);
+
         if (statut == StatutPaiement.REUSSI) {
             Utilisateur utilisateur = commande.getUser();
             if (utilisateur != null) {
-                // Calculer le montant total de la commande
+                System.out.println("Utilisateur trouvé : " + utilisateur.getId() + ", Points actuels : " + utilisateur.getPointsFidelite());
+
                 double montantTotal = commande.getItemsCommande().stream()
                         .mapToDouble(item -> item.getProduit().getPrix() * item.getQuantite())
                         .sum();
 
-                // Ajouter les points de fidélité (1€ = 1 point)
                 int pointsGagnes = (int) montantTotal;
                 utilisateur.setPointsFidelite(utilisateur.getPointsFidelite() + pointsGagnes);
                 utilisateurRepository.save(utilisateur);
 
-                // Vérifier si les points atteignent ou dépassent 100
-                while (utilisateur.getPointsFidelite() >= 100) {
+                System.out.println("Points de fidélité ajoutés. Nouveau total : " + utilisateur.getPointsFidelite());
+
+                int nombreDeRecompenses = utilisateur.getPointsFidelite() / 100;
+                System.out.println("Nombre de récompenses à générer : " + nombreDeRecompenses);
+
+                for (int i = 0; i < nombreDeRecompenses; i++) {
+                    System.out.println("Génération de la récompense " + (i + 1) + " pour l'utilisateur : " + utilisateur.getId());
                     recompenseService.genererRecompensePourUtilisateur(utilisateur.getId());
-                    utilisateur = utilisateurRepository.findById(utilisateur.getId())
-                            .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé après mise à jour"));
                 }
 
-                System.out.println("Points mis à jour : " + utilisateur.getPointsFidelite());
+                utilisateur.setPointsFidelite(utilisateur.getPointsFidelite() % 100);
+                utilisateurRepository.save(utilisateur);
+                System.out.println("Points mis à jour après génération des récompenses : " + utilisateur.getPointsFidelite());
             }
         }
 
@@ -99,8 +107,6 @@ public class PaiementService {
 
 
 
-
-    // Méthode pour ajouter des points de fidélité
     private void ajouterPointsFidelite(Commande commande, double montant) {
         Utilisateur utilisateur = commande.getUser();
         if (utilisateur != null) {
@@ -108,14 +114,17 @@ public class PaiementService {
             utilisateur.setPointsFidelite(utilisateur.getPointsFidelite() + pointsGagnes);
             utilisateurRepository.save(utilisateur);
 
-            // Vérifier si les points atteignent ou dépassent 100
+
             while (utilisateur.getPointsFidelite() >= 100) {
                 recompenseService.genererRecompensePourUtilisateur(utilisateur.getId());
                 utilisateur = utilisateurRepository.findById(utilisateur.getId())
                         .orElseThrow(() -> new EntityNotFoundException("Utilisateur non trouvé après mise à jour"));
             }
+            utilisateurRepository.save(utilisateur);
+            System.out.println("Points mis à jour : " + utilisateur.getPointsFidelite());
         }
     }
+
 
 
     public PaiementDtoGet getPaiementById(Long id) {
@@ -147,14 +156,17 @@ public class PaiementService {
         return true;
     }
     public String createPayPalOrder(Long commandeId) throws Exception {
+        // Log la commande ID
+        System.out.println("Création de la commande PayPal pour la commande ID : " + commandeId);
+
         Commande commande = commandeRepository.findById(commandeId)
                 .orElseThrow(() -> new RuntimeException("Commande non trouvée pour l'ID : " + commandeId));
+        System.out.println("Commande trouvée : " + commande);
 
         double montantTotal = commande.getItemsCommande().stream()
                 .mapToDouble(item -> item.getProduit().getPrix() * item.getQuantite())
                 .sum();
 
-        // Corrigez ici le montant
         String montantFormate = String.format("%.2f", montantTotal).replace(",", ".");
         System.out.println("Montant total formaté : " + montantFormate);
 
@@ -165,35 +177,53 @@ public class PaiementService {
                         Arrays.asList(
                                 new PurchaseUnitRequest.Builder(
                                         new AmountWithBreakdown.Builder(
-                                                "EUR", // Devise
-                                                montantFormate // Montant corrigé
-                                        ).build()
-                                ).build()
-                        )
-                ).build()
-        ).build();
+                                                "EUR",
+                                                montantFormate
+                                        ).build())
+                                        .description("Commande de produits : ID " + commandeId)
+                                        .referenceId("COMMANDE_" + commandeId)
+                                        .build()))
+                        .build())
+                .build();
 
         OrdersController ordersController = client.getOrdersController();
 
         try {
             ApiResponse<Order> response = ordersController.ordersCreate(ordersCreateInput);
-            String orderId = response.getResult().getId();
-            System.out.println("Commande PayPal créée avec succès. Order ID : " + orderId);
-            System.out.println("Réponse complète de PayPal : " + response.getResult());
-            return orderId;
+            Order result = response.getResult();
+            String orderId = result.getId();
+            System.out.println("Order ID créé : " + orderId);
+            String approvalLink = result.getLinks().stream()
+                    .filter(link -> "approve".equals(link.getRel())) // Cherche le lien "approve"
+                    .map(link -> link.getHref())
+                    .findFirst()
+                    .orElseThrow(() -> new RuntimeException("Lien d'approbation introuvable."));
+            System.out.println("Lien d'approbation PayPal : " + approvalLink);
+            return approvalLink;
+
         } catch (ApiException e) {
             System.err.println("Erreur lors de l'appel à PayPal : " + e.getMessage());
             throw new RuntimeException("Erreur lors de la création de la commande PayPal", e);
         }
     }
+
     private Order captureOrderViaPayPal(String orderId) throws IOException, ApiException {
         OrdersCaptureInput ordersCaptureInput = new OrdersCaptureInput.Builder(orderId, null).build();
         OrdersController ordersController = client.getOrdersController();
 
-        ApiResponse<Order> apiResponse = ordersController.ordersCapture(ordersCaptureInput);
-        System.out.println("Commande capturée avec succès via PayPal : " + apiResponse.getResult());
-        return apiResponse.getResult(); // Retourne l'objet Order capturé
+        try {
+            ApiResponse<Order> apiResponse = ordersController.ordersCapture(ordersCaptureInput);
+            System.out.println("Réponse complète de l'API PayPal : " + apiResponse.getResult());
+            return apiResponse.getResult();
+        } catch (ApiException e) {
+            System.err.println("Message d'erreur de l'API PayPal : " + e.getMessage());
+            if (e.getCause() != null) {
+                System.err.println("Cause de l'erreur : " + e.getCause().getMessage());
+            }
+            throw e;
+        }
     }
+
 
 
     public PaiementDtoGet capturePayPalOrder(String orderId, Long commandeId) throws Exception {
@@ -202,13 +232,14 @@ public class PaiementService {
         try {
             // Capturer l'ordre via PayPal
             Order capturedOrder = captureOrderViaPayPal(orderId);
+            System.out.println("Statut de l'Order après capture : " + capturedOrder.getStatus());
 
             if ("COMPLETED".equals(capturedOrder.getStatus())) {
-                // Récupérer la commande associée dans la base de données
+                // Logique de sauvegarde du paiement et mise à jour de la commande
                 Commande commande = commandeRepository.findById(commandeId)
                         .orElseThrow(() -> new RuntimeException("Commande non trouvée pour l'ID : " + commandeId));
+                System.out.println("Commande après capture : " + commande);
 
-                // Créer un nouveau paiement dans la base de données
                 Paiement paiement = new Paiement();
                 paiement.setMontant(commande.getItemsCommande().stream()
                         .mapToDouble(item -> item.getProduit().getPrix() * item.getQuantite())
@@ -218,40 +249,59 @@ public class PaiementService {
                 paiement.setCommande(commande);
                 paiement.setDatePaiement(LocalDateTime.now());
                 Paiement savedPaiement = paiementRepository.save(paiement);
-                System.out.println("Paiement enregistré : " + savedPaiement.getId());
+                System.out.println("Paiement sauvegardé : " + savedPaiement);
 
-                // Mettre à jour le statut de la commande
                 commande.setStatut(EtatCommande.TERMINEE);
                 commandeRepository.save(commande);
-                System.out.println("Statut de la commande mis à jour à TERMINEE");
+                System.out.println("Commande mise à jour : " + commande);
 
-                // Ajouter des points de fidélité
                 if (commande.getUser() != null) {
                     ajouterPointsFidelite(commande, paiement.getMontant());
                     System.out.println("Points de fidélité ajoutés.");
                 }
 
-                return convertToDtoGet(savedPaiement); // Retourne le DTO de paiement
+                return convertToDtoGet(savedPaiement);
             } else {
                 System.err.println("Le paiement n'est pas terminé : " + capturedOrder.getStatus());
                 throw new Exception("Le paiement n'est pas terminé");
             }
         } catch (ApiException e) {
-            // Gestion des erreurs
             System.err.println("Erreur lors de la capture du paiement PayPal : " + e.getMessage());
-            e.printStackTrace(); // Log complet pour diagnostiquer
+            e.printStackTrace();
             throw new Exception("Erreur lors de la capture du paiement PayPal", e);
         }
-
     }
+    public List<CommandeDtoGet> getCommandesPayees() {
+        List<Commande> commandes = paiementRepository.findCommandesByPaiementStatut(StatutPaiement.REUSSI);
 
+        return commandes.stream()
+                .map(this::convertToDto)
+                .collect(Collectors.toList());
+    }
+    private CommandeDtoGet convertToDto(Commande commande) {
+        CommandeDtoGet dto = new CommandeDtoGet();
+        dto.setId(commande.getId());
+        dto.setNumeroCommande(commande.getNumeroCommande());
+        dto.setDetailsCommande(commande.getDetailsCommande());
+        dto.setStatut(commande.getStatut());
+        dto.setAdresseLivraison(commande.getAdresseLivraison());
+        dto.setTelephone(commande.getTelephone());
+        dto.setTypeLivraison(commande.getTypeLivraison());
 
+        if (commande.getUser() != null) {
+            dto.setUserId(commande.getUser().getId());
+        }
 
+        if (commande.getPanier() != null) {
+            dto.setPanierId(commande.getPanier().getId());
+        }
 
+        if (commande.getPaiement() != null) {
+            dto.setPaiementId(commande.getPaiement().getId());
+        }
 
-
-
-
+        return dto;
+    }
 
     private PaiementDtoGet convertToDtoGet(Paiement paiement) {
         PaiementDtoGet dtoGet = new PaiementDtoGet();

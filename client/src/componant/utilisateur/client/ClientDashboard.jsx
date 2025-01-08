@@ -1,13 +1,22 @@
-import React from 'react';
-import { useSelector } from 'react-redux';
+import React, { useEffect } from 'react';
+import { useDispatch, useSelector } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { recupererHistoriqueRecompensesThunk } from '../../recompense/recompenseSlice';
 import "../client/clientdashboard.css";
-import Header from '../../../shared/header/Header';
-import Navbar from '../../../shared/navbar/Navbar';
+
 
 const ClientDashboard = () => {
+  const dispatch = useDispatch();
   const user = useSelector((state) => state.auth.user);
   const navigate = useNavigate();
+  const recompenses = useSelector((state) => state.recompense.recompenses);
+  const chargementRecompenses = useSelector((state) => state.recompense.chargement);
+
+  useEffect(() => {
+    if (user?.id) {
+      dispatch(recupererHistoriqueRecompensesThunk(user.id));
+    }
+  }, [dispatch, user]);
   
   if (!user) {
     return <p>Chargement de vos informations...</p>;
@@ -45,6 +54,25 @@ const ClientDashboard = () => {
             style={{ width: `${progressPercentage}%` }}
           ></div>
         </div>
+      </div>
+      <div className="recompenses-section">
+        <h2>Vos récompenses obtenues</h2>
+        {chargementRecompenses ? (
+          <p>Chargement de vos récompenses...</p>
+        ) : recompenses.length > 0 ? (
+          <ul className="recompenses-list">
+            {recompenses.map((recompense) => (
+              <li key={recompense.id} className="recompense-item">
+                <p><strong>{recompense.nom}</strong></p>
+                <p>{recompense.description}</p>
+                <p>Date obtenue : {new Date(recompense.dateRemise).toLocaleDateString()}</p>
+                <p>Code : <strong>{recompense.codeRemise}</strong></p>
+              </li>
+            ))}
+          </ul>
+        ) : (
+          <p>Vous n'avez pas encore obtenu de récompenses.</p>
+        )}
       </div>
 
       <div className="actions-section">

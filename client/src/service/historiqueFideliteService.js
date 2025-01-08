@@ -1,6 +1,7 @@
 import axios from 'axios';
 
 const URL_API = 'http://localhost:8080/api/historique-fidelite';
+const URL_API_COMMANDE = 'http://localhost:8080/api/commandes';
 
 // Configuration de l'intercepteur pour inclure le token JWT dans chaque requête
 axios.interceptors.request.use(
@@ -15,52 +16,57 @@ axios.interceptors.request.use(
 );
 
 const HistoriqueFideliteService = {
-    // Récupérer le nombre de commandes par semaine
     getCommandesParSemaine: async (dateDebut) => {
-        const response = await axios.get(`${URL_API}/commandes-par-semaine`, {
-            params: { dateDebut },
-        });
-        return response.data; // Retourne la liste des commandes par jour
+        try {
+            const response = await axios.get(`${URL_API_COMMANDE}/par-semaine`, {
+                params: { dateDebut },
+            });
+            return response.data;
+        } catch (error) {
+            console.error("Erreur lors de l'appel à getCommandesParSemaine:", error.response?.data || error.message);
+            throw error;
+        }
     },
 
-    // Récupérer le nombre de récompenses par semaine
+    
     getRecompensesParSemaine: async (dateDebut) => {
         const response = await axios.get(`${URL_API}/recompenses-par-semaine`, {
             params: { dateDebut },
         });
-        return response.data; // Retourne le total des récompenses
+        return response.data; 
     },
 
-    // Comparer les commandes entre deux semaines
+    
     compareCommandesEntreSemaines: async (semaineActuelle) => {
         const response = await axios.get(`${URL_API}/comparaison-commandes`, {
             params: { semaineActuelle },
         });
-        return response.data; // Retourne le pourcentage d'augmentation ou de diminution
+        console.log("API Response for comparison:", response.data);
+        return response.data; 
     },
 
-    // Créer un historique de fidélité
+    
     createHistoriqueFidelite: async (historiqueData) => {
         const response = await axios.post(URL_API, historiqueData);
-        return response.data; // Retourne l'objet HistoriqueFidelite créé
+        return response.data; 
     },
 
-    // Récupérer l'historique par utilisateur
+    
     getHistoriqueParUtilisateur: async (userId) => {
         const response = await axios.get(`${URL_API}/user/${userId}`);
-        return response.data; // Retourne une liste des historiques pour cet utilisateur
+        return response.data; 
     },
 
-    // Récupérer l'historique par mois
+    
     getHistoriqueParMois: async (annee, mois) => {
         const response = await axios.get(`${URL_API}/mois/${annee}/${mois}`);
-        return response.data; // Retourne une liste des historiques pour le mois spécifié
+        return response.data; 
     },
 
-    // Compter les récompenses par mois
+    
     countRecompensesParMois: async (annee, mois) => {
         const response = await axios.get(`${URL_API}/compte-recompenses/${annee}/${mois}`);
-        return response.data; // Retourne le total des récompenses pour le mois spécifié
+        return response.data; 
     },
 };
 

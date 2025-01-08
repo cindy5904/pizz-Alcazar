@@ -46,11 +46,26 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
     @Autowired
     private JwtTokenProvider jwtTokenProvider;
+    private void validatePassword(String password) {
+        if (password.length() < 8) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "Le mot de passe doit contenir au moins 8 caractères.");
+        }
+        if (!password.matches(".*[A-Z].*")) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "Le mot de passe doit contenir au moins une majuscule.");
+        }
+        if (!password.matches(".*\\d.*")) {
+            throw new AppException(HttpStatus.BAD_REQUEST, "Le mot de passe doit contenir au moins un chiffre.");
+        }
+    }
+
     @Transactional
     @Override
     public String register(RegisterDto registerDto) {
+
+        validatePassword(registerDto.getMotDePasse());
+
         if (utilisateurRepository.existsByEmail(registerDto.getEmail())) {
-            throw new AppException(HttpStatus.BAD_REQUEST, "Email already exists!");
+            throw new AppException(HttpStatus.BAD_REQUEST, "L'email existe déjà !");
         }
 
         Utilisateur utilisateur = new Utilisateur();
@@ -66,9 +81,8 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
         utilisateur.getUserRoles().add(roleClient);
 
         utilisateurRepository.save(utilisateur);
-        return "User Registered Successfully!";
+        return "Utilisateur enregistré avec succès !";
     }
-
 
     @Override
     public LoginResponse login(LoginDto loginDto) {
@@ -111,17 +125,13 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
             System.out.println("Contenu de LoginResponse avant retour : " + loginResponse); // Log pour vérifier le contenu
             return loginResponse;
         } catch (InternalAuthenticationServiceException e) {
-            // Log l'erreur
             System.out.println("InternalAuthenticationServiceException: " + e.getMessage());
             throw e;
         } catch (AuthenticationException e) {
-            // Log l'erreur
             System.out.println("AuthenticationException: " + e.getMessage());
             throw e;
         }
     }
-
-
 
     @Override
     public Long getIdByEmail(String email) {
@@ -143,7 +153,6 @@ public class AuthServiceImpl implements AuthService, UserDetailsService {
 
     @Override
     public void logout() {
-        // Supprime l'authentification de l'utilisateur
         SecurityContextHolder.clearContext();
     }
     @Override

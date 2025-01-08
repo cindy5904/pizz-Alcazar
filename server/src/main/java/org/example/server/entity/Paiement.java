@@ -23,6 +23,6 @@ public class Paiement {
     private StatutPaiement statut;
     private String moyenPaiement;
     private LocalDateTime datePaiement;
-    @OneToOne(mappedBy = "paiement")
+    @OneToOne(mappedBy = "paiement", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
     private Commande commande;
 }
